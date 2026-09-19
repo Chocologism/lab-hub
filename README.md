@@ -1,196 +1,421 @@
-# LabHub - 课题组内部科研协作平台
+# LabHub - 现代学术课题组轻量级科研协作平台 / Modern Academic Research Lab Hub
 
-> **LabHub** 是专为科研课题组打造的轻量级内部协作平台，重点解决文献分享门槛高、组会日程零散、教材资料索引割裂等日常痛点。
+<p align="center">
+  <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=80" alt="LabHub Banner" width="100%" style="border-radius: 12px; max-height: 320px; object-fit: cover;" />
+</p>
 
----
-
-## 🌟 核心功能亮点
-
-1. **📄 arXiv 每日文献推荐流**
-   * **自动解析元数据**：粘贴 arXiv 链接或论文编号，自动异步抓取标题、作者、摘要与 PDF 链接；
-   * **导师重点关注专区**：导师（PI）发布的推荐享有专属金黄色徽章与优先置顶流；
-   * **学术打卡与互动**：支持一键“标记已读”学术打卡与简短科研笔记交流；
-   * **个人收藏**：文献与书籍卡片星标收藏，侧栏和头像菜单均可进入“我的收藏”。
-2. **📅 组会排期与纪要（Seminar Schedule）**
-   * 可视化时间轴日程管理，支持主讲人、地点/腾讯会议号登记；
-   * **业务联动**：新建组会排期时，可直接从站内已推荐的 arXiv 库中选取文献，避免重复录入；
-   * 关联课件 Slides 课件下载与会议纪要。
-3. **📚 教材专著与经典综述中心（Resource Hub）**
-   * 分类收录组内入门专著与前沿综述；
-   * 快捷直达外链矩阵：`[📖 讲义教程]`、`[✍️ 习题集解答]`、`[🐙 GitHub 仓库]`、`[📥 资料下载]`。
-4. **🔐 组内邀请码与角色权限体系**
-   * 全站私有化，不开放任意注册，凭组内专属邀请码（默认 `LAB-2026`）注册；
-   * 角色分级：系统管理员（Admin）、导师（Teacher / PI）、组员（Student）。
+<p align="center">
+  <a href="#-中文文档"><img src="https://img.shields.io/badge/文档-简体中文-blue.svg" alt="Chinese Doc"></a>
+  <a href="#-english-documentation"><img src="https://img.shields.io/badge/Document-English-green.svg" alt="English Doc"></a>
+  <img src="https://img.shields.io/badge/License-MIT-emerald.svg" alt="License">
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB.svg?logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Vue.js-3.x-4FC08D.svg?logo=vuedotjs&logoColor=white" alt="Vue 3">
+  <img src="https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Cloudflare-D1%20%7C%20R2%20%7C%20Pages-F38020.svg?logo=cloudflare&logoColor=white" alt="Cloudflare">
+  <img src="https://img.shields.io/badge/Vibe--Coding-AI--Assisted-8A2BE2.svg" alt="Vibe Coding">
+  <img src="https://img.shields.io/badge/Non--Profit-100%25%20Open%20Source-ff69b4.svg" alt="Non-Profit">
+</p>
 
 ---
 
-## 🛠 技术栈一览
+## 快速导航 / Quick Navigation
 
-* **前端**：Vue 3 + Vite + Tailwind CSS + Axios
-* **后端**：Python 3.11+ + FastAPI + Pydantic v2 + 原生 bcrypt + JWT
-* **数据库**：SQLite 3（单文件免维护，开启 WAL 模式提升并发）
-* **容器化**：Docker 多阶段构建与 Docker Compose 编排
+- [🇨🇳 中文文档](#-中文文档)
+  - [一、项目初衷 (Motivation)](#一项目初衷-motivation)
+  - [二、模块设计与系统架构 (Architecture)](#二模块设计与系统架构-architecture)
+  - [三、使用手册与快速上手 (User Manual)](#三使用手册与快速上手-user-manual)
+  - [四、版权、致谢与开源声明 (Copyright & Acknowledgements)](#四版权致谢与开源声明-copyright--acknowledgements)
+- [🇬🇧 English Documentation](#-english-documentation)
+  - [1. Motivation](#1-motivation)
+  - [2. Modular Design & Architecture](#2-modular-design--architecture)
+  - [3. User Manual & Getting Started](#3-user-manual--getting-started)
+  - [4. Copyright, Acknowledgements & Open Source Statement](#4-copyright-acknowledgements--open-source-statement)
 
 ---
 
-## 🚀 快速启动指南
+# 🇨🇳 中文文档
 
-### 方式一：一键启动脚本（推荐开发与测试使用）
+## 一、项目初衷 (Motivation)
+
+在高校与科研院所的高水平实验室、课题组日常运转中，科研人员与研究生长期面临着**流程割裂、信息孤岛、工具碎片化**的痛点：
+
+1. **文献交流随意而零散**：arXiv 最新文献与顶刊论文常常随手转发到微信群、QQ 群或个人邮件中，阅后即焚，极易被日常聊天冲淡，缺乏课题组层面的统一沉淀、分类研讨与持续追踪机制；
+2. **组会排期冲突与准备低效**：组会日程通常依赖 Excel 互发或口头沟通，经常遭遇排期撞车；轮值汇报人填报题目与摘要不及时，组员无法提前获取 Slides 预习；
+3. **经典教材与科研资料检索困难**：经典教科书、导师专著、讲义 PPT 以及 GitHub 配套代码仓库散落于网盘、私聊文件与硬盘，新人进组时需要反复索要资料，缺乏统一维护的文库；
+4. **讲座学术通知大量被淹没**：学术年会、大会海报、院系前沿报告通常以长图或邮件形式分发，缺乏快速自动解析并一键入历的轻量工具；
+5. **AI 辅助学术能力缺乏深度结合**：通用 AI 工具割裂于科研业务之外，无法直接在文献流、组会讨论与 LaTeX 公式推导中无缝响应。
+
+**LabHub** 由此应运而生。它致力于为学术课题组提供一个**开箱即用、全流程贯通、高颜值、现代化且零服务器成本**的一站式科研学术协作平台。
+
+---
+
+## 二、模块设计与系统架构 (Architecture)
+
+LabHub 采用高度模块化的前后端分离架构，同时原生支持**自建本地/私有服务器模式**与**Cloudflare 全托管边缘 Serverless 模式**。
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                                LabHub 前端界面                          │
+│     (Vue 3 + Vite + Tailwind CSS + Three.js 3D + KaTeX LaTeX 渲染)     │
+└────────────────────────────────────┬───────────────────────────────────┘
+                                     │
+          ┌──────────────────────────┴──────────────────────────┐
+          ▼                                                     ▼
+┌──────────────────────────────────┐  ┌──────────────────────────────────┐
+│        方案 A：私有云 / 容器自建    │  │     方案 B：Cloudflare Serverless │
+│   (FastAPI + SQLite WAL + Docker)│  │   (Pages Functions + D1 + R2)   │
+├──────────────────────────────────┤  ├──────────────────────────────────┤
+│ • Python 异步高性能 Web 核心      │  │ • TypeScript 全球边缘毫秒冷启动   │
+│ • SQLite3 嵌入式单文件数据库      │  │ • Cloudflare D1 分布式数据库     │
+│ • 本地挂载目录文件与海报存储      │  │ • Cloudflare R2 对象存储(免流量) │
+└──────────────────────────────────┘  └──────────────────────────────────┘
+```
+
+### 核心功能模块设计
+
+```
+• 模块 1：工作台主页 (Home Dashboard)
+  ├─ 快捷科研行动流（快速粘贴 arXiv 推荐文献、快速登记报告）
+  ├─ 全组重要截稿通知与讲座滚动跑马灯 (Notice Marquee)
+  ├─ 每周科研日程视图（支持按周左右拖拽钻取）
+  └─ 个人最近组会汇报与文献分享倒计时看板
+
+• 模块 2：学术日程与组会系统 (Seminar & Academic Schedule)
+  ├─ 三维多视图切换：时间轴 (Timeline)、周日历 (Weekly Calendar) 与学术会议雷达 (Conferences)
+  ├─ 3D 封面轮播相册：基于 Three.js 打造的沉浸式学术海报与组会视觉呈现
+  ├─ 主讲人填报与待办提醒：自动检测并提示主讲人补充题目与摘要
+  ├─ 日历集成与治理：一键导出标准 iCalendar (.ics) 同步至手机日历；管理员排期顺延与冲突检测
+  └─ 批量数据导入：支持解析带有主讲人与主题的 Excel / CSV 排期表
+
+• 模块 3：文献推荐与深度研讨 (arXiv Feed & Collaborative Library)
+  ├─ 自动解析文献：输入 arXiv 编号/链接或 DOI，异步智能补全标题、作者、分类与摘要
+  ├─ 细粒度分发受众：支持“公开推荐”（全组可见）与“定向推荐”（仅指定导师或合作者可见）
+  ├─ 导师重点关注徽章：课题组负责人（PI）推荐专属金色高亮流
+  ├─ 交互与学术打卡：组员一键标记已读、沉淀多楼层科研研讨评论
+  └─ 组会联动：新建组会时可直接链接已有文献，排期与文献库互相钻取
+
+• 模块 4：教材资料与专著文库 (Resource Hub)
+  ├─ 体系化分类导航：按基础理论、专业方向与工具库分门别类
+  ├─ 快速定位索引：支持拼音首字母智能筛选与星标收藏量排序
+  └─ 四维外链矩阵：直接聚合讲义在线教程、习题解答、配套 GitHub 代码仓库与原著下载
+
+• 模块 5：学术邮箱与智能海报解析 (Mailbox & Poster OCR)
+  ├─ 邮箱安全互联：支持主流高校及科研院所 IMAP/SMTP 邮箱聚合
+  ├─ 智能海报日程提取：多模态 AI 智能提取长图海报关键时间、地点与报告人
+  └─ 一键入历与防重排：解析后自动核对去重，一键推送到组内公共日历
+
+• 模块 6：科研 AI 助手 (AI Research Assistant)
+  ├─ 复杂公式渲染：KaTeX 实时解析复杂的 LaTeX 数学物理公式推导
+  ├─ 双语学术润色与翻译：精准保留术语与公式符号的专业翻译模式
+  └─ 多模型供应商兼容：支持接入 OpenAI、DeepSeek 或 Cloudflare Workers AI
+
+• 模块 7：课题组治理与个人定制 (Governance & Customization)
+  ├─ 专属注册邀请码：内置邀请码机制（默认 LAB-2026），杜绝未经授权的外人注册
+  ├─ 三级权限体系：系统管理员 (Admin)、导师/负责人 (Teacher/PI)、组员 (Student)
+  ├─ 个性化外观：微光毛玻璃等多套质感皮肤、自定义动态星空背景
+  └─ 全屏实景互动新手引导：高亮聚光灯与动态箭头逐页面带教
+```
+
+---
+
+## 三、使用手册与快速上手 (User Manual)
+
+### 1. 部署方式选择
+
+#### 选项 A：极速本地脚本运行（适合开发与体验）
 
 ```bash
 # 1. 克隆代码仓库
-git clone https://github.com/<your-username>/lab-hub.git
+git clone https://github.com/Chocologism/lab-hub.git
 cd lab-hub
 
 # 2. 赋予脚本执行权限并启动
 chmod +x start.sh
 ./start.sh
 ```
+启动成功后，浏览器打开 `http://127.0.0.1:8000` 即可开始使用。脚本会自动检测 Python 虚拟环境与依赖项，构建前端静态文件，并启动 Uvicorn 异步服务。
 
-脚本将自动创建 Python 虚拟环境、安装依赖、编译前端静态资源，并在 `http://127.0.0.1:8000` 启动完整服务。
+#### 选项 B：Docker 容器化部署（适合私有服务器与长期托管）
 
-### 方式二：手动分步启动（适合独立联调开发）
+仓库内置了标准 Dockerfile 与 Docker Compose 编排文件，支持开箱即用的一键容器化启动与数据持久化：
 
-#### 1. 后端启动
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r backend/requirements.txt
-# 运行后端
-uvicorn backend.main:app --reload --port 8000
+# 进入部署目录并启动容器
+docker compose -f deploy/docker-compose.yml up -d
 ```
 
-#### 2. 前端启动
-```bash
-cd frontend
-npm install
-npm run dev
-# 前端开发服务将运行在 http://localhost:5173，已配置跨域代理至 8000 端口
-```
+- **服务端口**：默认绑定宿主机 `8000` 端口；
+- **数据持久化**：SQLite 数据库自动保存在本地 `./data/labhub.db`，容器销毁或版本升级数据不丢失；
+- **环境变量配置**：可在 `deploy/docker-compose.yml` 中配置 `LABHUB_INVITE_CODE`（注册邀请码）与 `LABHUB_SECRET_KEY`（JWT 签名密钥）。
 
-### 方式三：Docker 一键容器化部署（适合服务器生产环境）
-```bash
-cd deploy
-docker compose up -d
-```
-数据库将自动挂载保存在 `deploy/data/` 目录下，持久化安全存储。
+#### 选项 C：Cloudflare 全托管 Serverless 部署（适合追求零服务器成本与全球直连）
+
+LabHub 原生支持部署至 Cloudflare 边缘计算平台，实现**全天候零物理服务器、零成本、抗断电断网的高可用服务**：
+
+1. **安装依赖与登录**：
+   ```bash
+   npm install -g wrangler
+   npx wrangler login
+   ```
+2. **初始化 D1 数据库与 R2 存储桶**：
+   ```bash
+   cd frontend
+   npx wrangler d1 create labhub-db
+   npx wrangler r2 bucket create labhub-files
+   # 执行 D1 初始建表迁移
+   npx wrangler d1 execute labhub-db --file=functions/schema.sql
+   ```
+3. **构建并发布至 Cloudflare Pages**：
+   ```bash
+   npm run build
+   npx wrangler pages deploy dist --project-name lab-hub
+   ```
+详细步骤与现有 SQLite 数据库无损迁移教程，请参阅完整指南：[Cloudflare 部署指南](docs/CLOUDFLARE_DEPLOYMENT.md)。
 
 ---
 
-## 🧪 自动化测试
+### 2. 初始配置与凭证说明 (Initial Setup)
 
-项目已内置端到端接口测试套件：
-```bash
-source .venv/bin/activate
-PYTHONPATH=. pytest backend/test_api.py -v
+- **首次初始化向导**：
+  访问 `http://127.0.0.1:8000/setup`（或 Cloudflare 线上网址对应的 `/setup`），系统将引导创建**首位超级管理员 (Admin)** 账号。创建完成后，系统会自动关闭初始化入口以保障安全。
+- **课题组专属邀请码**：
+  新成员注册时必须填写邀请码。系统默认邀请码为：`LAB-2026`。管理员可随时在系统设置或环境变量中修改。
+- **三级角色权限机制**：
+  - **管理员 (Admin)**：全局设置、批量导入排期、成员角色晋升/移除、文献管理与全组反馈受理；
+  - **导师 / 负责人 (PI / Teacher)**：发表置顶公告、推荐带金色徽章的重点文献、指派组会主讲人；
+  - **组员 (Student)**：推荐文献、填写组会题目与摘要、下载资料文库教材、提交反馈建议。
+
+---
+
+### 3. 日常核心协同工作流 (Daily Workflows)
+
+- **文献智能录入与定向研讨**：
+  在主页或文献库右上角点击“推荐文献”，直接粘贴 arXiv ID（如 `2312.12345`）或 DOI。系统将后台异步抓取标题、作者及摘要。支持选择**公开推荐**（全组研讨）或**定向推荐**（仅发送给指定导师或合作师兄师妹，保护未发表 idea 的私密交流）。
+- **组会排期与 iCalendar 日历同步**：
+  管理员可通过 Excel/CSV 批量导入学期排期。主讲人在组会前一周将收到主页待办提醒，点击即可快速填报分享主题与上传 Slide 课件。组员可在组会页面点击“导出日历”，一键将组会日历导入 Apple Calendar、Google Calendar 或 Outlook。
+- **专著教材文库检索**：
+  进入“资料整合”模块，支持按拼音首字母检索课题组经典书目，并支持查看在线代码库与课件链接。
+
+---
+
+## 四、版权、致谢与开源声明 (Copyright & Acknowledgements)
+
+### 1. Vibe Coding 开发范式
+
+本项目是 **Vibe Coding**（人机协同敏捷创新、意图驱动交付）开发理念的代表性落地实践。通过以人类科研痛点为高维意图引领，借助前沿 AI 编码智能体进行自顶向下的架构演进、逻辑推演与测试闭环，让复杂的全栈学术平台在极短周期内实现工业级的高质量交付。
+
+### 2. 辅助开发与编码智能体致谢
+
+在 LabHub 的全生命周期研发与重构中，特别致谢以下尖端人工智能编码工具的深度辅助支持：
+- **OpenAI Codex**：在后端异步 API 设计、权限矩阵安全校验、自动化测试集编排与算法边界测试中提供了强有力的代码生成与智能推断支持。
+- **Google DeepMind Antigravity**：在全栈工程架构设计、Vue 3 现代化响应式设计规范重构、多模态海报解析流打通以及 Cloudflare Serverless 双轨架构适配中发挥了关键的架构决策与代码落地作用。
+
+### 3. 开源生态与视觉动画效果致敬
+
+LabHub 的现代化视觉体验离不开全球优秀开源社区的滋养与启发。特别向以下开源技术与动画库致敬：
+- **Three.js**：驱动组会日程中极具未来感的 3D 环形交互画廊与沉浸式海报走廊；
+- **Tailwind CSS & Glassmorphism UI**：赋予平台微光磨砂玻璃质感、灵动平滑的过渡动画与完美的移动端响应式布局；
+- **KaTeX**：提供毫秒级、极速精准的学术 LaTeX 数学公式与物理方程实时排版渲染；
+- **Lucide Icons**：为整个学术协作工作台提供风格严谨统一、优雅美观的高清矢量图标体系；
+- **Vue 3 & FastAPI**：现代前端渐进式框架与 Python 顶尖高性能异步 Web 框架的完美结合。
+
+### 4. 永久开源与非营利声明 (Non-Profit Statement)
+
+- **MIT 开源协议**：LabHub 采用国际通用的 [MIT 许可证](LICENSE) 彻底开源。您可以自由地商用、修改、分发或私有部署。
+- **纯粹非营利倡议**：**本项目完全开源，永久免费，绝不牟利，绝无商业推广或付费暗桩**。本项目的唯一使命是为全球高校、科研院所、前沿实验室及年轻学者提供现代、高效、低成本的科研数字化协作基础设施，加速科学知识的传承与创新。
+- **欢迎学术社区共建**：欢迎全球学者、研究生与开发者提交 Pull Request、报告 Issue 或分享您的课题组定制心得！
+
+---
+
+# 🇬🇧 English Documentation
+
+## 1. Motivation
+
+In high-level academic research laboratories, institutes, and research groups worldwide, researchers and graduate students frequently struggle with **fragmented workflows, information silos, and tool sprawl**:
+
+1. **Scattered Literature Sharing**: Interesting arXiv preprints and top-tier journal papers are casually pasted into chat groups or emails. These papers are quickly buried by daily chat messages, lacking centralized archival, thematic categorization, and collective discussion.
+2. **Disorganized Seminar Scheduling**: Group meeting schedules often rely on static Excel sheets or ad-hoc verbal agreements, leading to time conflicts and delayed topic/abstract submissions. Group members frequently lack timely access to slides beforehand.
+3. **Fragmented Academic Textbooks & Reference Materials**: Classic textbooks, mentor monographs, lecture slides, and companion GitHub repositories are scattered across cloud drives and local hard drives. New students face significant friction requesting onboarding resources.
+4. **Overwhelmed Conference & Colloquium Posters**: Academic notices and seminar announcements circulate as long posters or text announcements, lacking lightweight tools to automatically extract event details and sync them with calendars.
+5. **Lack of Deep Academic AI Integration**: Generic AI tools operate separately from research activities and cannot seamlessly assist within literature discussions or LaTeX derivations.
+
+**LabHub** is created to resolve these challenges. It aims to deliver an **out-of-the-box, comprehensive, aesthetically pleasing, and zero-server-cost** all-in-one collaborative research platform tailored for academic laboratories.
+
+---
+
+## 2. Modular Design & Architecture
+
+LabHub features a clean, decoupled modular architecture natively supporting both **self-hosted private servers** and **Cloudflare fully managed Serverless deployment**.
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                          LabHub Frontend Interface                     │
+│     (Vue 3 + Vite + Tailwind CSS + Three.js 3D + KaTeX LaTeX Rendering)│
+└────────────────────────────────────┬───────────────────────────────────┘
+                                     │
+          ┌──────────────────────────┴──────────────────────────┐
+          ▼                                                     ▼
+┌──────────────────────────────────┐  ┌──────────────────────────────────┐
+│   Option A: Self-Hosted / Docker │  │ Option B: Cloudflare Serverless  │
+│   (FastAPI + SQLite WAL + Docker)│  │   (Pages Functions + D1 + R2)    │
+├──────────────────────────────────┤  ├──────────────────────────────────┤
+│ • High-performance Python Async │  │ • Global edge millisecond start  │
+│ • Embedded SQLite3 single-file   │  │ • Cloudflare D1 edge SQL database│
+│ • Local storage / attached volume│  │ • Cloudflare R2 zero-egress bucket│
+└──────────────────────────────────┘  └──────────────────────────────────┘
+```
+
+### Core Functional Modules
+
+```
+• Module 1: Home Dashboard
+  ├─ Quick research action stream (instant arXiv submission & seminar logging)
+  ├─ Critical lab deadlines and rolling seminar announcement marquee
+  ├─ Weekly research calendar view with interactive week-by-week navigation
+  └─ Personal countdown timers for upcoming talks and journal clubs
+
+• Module 2: Seminar & Academic Schedule
+  ├─ Multi-dimensional views: Timeline, Weekly Calendar, and Conference Radar
+  ├─ Three.js 3D Poster Carousel: Immersive visual presentation for seminar posters
+  ├─ Speaker topic filling & automated reminder badges for pending abstracts
+  ├─ Calendar integration: One-click standard iCalendar (.ics) export
+  └─ Bulk schedule import via Excel / CSV with automatic member account matching
+
+• Module 3: Collaborative Literature Hub (arXiv & Journals)
+  ├─ Automatic metadata fetching via arXiv ID or DOI
+  ├─ Granular distribution scopes: Public (group-wide) vs. Directed (specific peers)
+  ├─ Principal Investigator (PI) highlight badge stream
+  ├─ Member check-ins, reading status markers, and threaded academic discussions
+  └─ Seamless linking between scheduled seminars and literature entries
+
+• Module 4: Resource Library & Monograph Hub
+  ├─ Hierarchical categorization (Fundamental Theory, Specialty Fields, Toolkits)
+  ├─ Pinyin & alphabetical quick indexing with favorite bookmarks
+  └─ 4D external link matrix (Online tutorials, solutions, GitHub repos, PDF downloads)
+
+• Module 5: Academic Mailbox & Poster OCR
+  ├─ Secure integration with university IMAP/SMTP mailboxes
+  ├─ Multimodal AI OCR: Automatically extracts time, speaker, and venue from poster images
+  └─ One-click calendar sync with deduplication checks
+
+• Module 6: AI Research Assistant
+  ├─ KaTeX LaTeX engine: Real-time rendering of complex mathematical & physical equations
+  ├─ Bilingual academic polishing and terminology-preserving translation
+  └─ Multi-vendor LLM support: OpenAI, DeepSeek, or Cloudflare Workers AI
+
+• Module 7: Governance & Personalization
+  ├─ Exclusive lab registration invite code (Default: LAB-2026)
+  ├─ 3-tier Role-Based Access Control: Admin, PI / Teacher, and Student
+  ├─ Multiple themes: Modern frosted glass (Glassmorphism), dynamic starry sky
+  └─ Full-screen interactive onboarding guide with spotlight walkthroughs
 ```
 
 ---
 
-## 🔑 系统账号与配置
+## 3. User Manual & Getting Started
 
-* **访问地址**：`http://localhost:8000`
-* **系统管理员账号**：`admin@lab.edu`（初始密码：`123456`，建议首次登录后于个人中心修改）
-* **组内注册邀请码**：`LAB-2026`（可通过环境变量 `LABHUB_INVITE_CODE` 修改）
-* **说明**：登录页面已隐藏公开快捷账号填充，保证系统纯净与安全性。组内师生请通过邀请码注册个人账号使用。
+### 1. Deployment Options
+
+#### Option A: Quick Local Script (Ideal for Development & Evaluation)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Chocologism/lab-hub.git
+cd lab-hub
+
+# 2. Grant execution permission and launch
+chmod +x start.sh
+./start.sh
+```
+
+Once running, navigate to `http://127.0.0.1:8000` in your browser. The script automatically sets up the Python virtual environment, installs dependencies, compiles the Vue frontend, and launches the FastAPI service.
+
+#### Option B: Docker Deployment (Ideal for Production Servers)
+
+The repository provides a production-ready Dockerfile and Docker Compose configuration with volume persistence:
+
+```bash
+# Launch container service
+docker compose -f deploy/docker-compose.yml up -d
+```
+
+- **Service Port**: Bound to host port `8000` by default.
+- **Data Persistence**: SQLite database is persisted under `./data/labhub.db`.
+- **Environment Variables**: Customize `LABHUB_INVITE_CODE` and `LABHUB_SECRET_KEY` in `deploy/docker-compose.yml`.
+
+#### Option C: Cloudflare Serverless Deployment (Zero Cost & Global High Availability)
+
+Run LabHub with zero physical server cost on Cloudflare Free Tier:
+
+1. **Install dependencies and login**:
+   ```bash
+   npm install -g wrangler
+   npx wrangler login
+   ```
+2. **Create D1 Database and R2 Bucket**:
+   ```bash
+   cd frontend
+   npx wrangler d1 create labhub-db
+   npx wrangler r2 bucket create labhub-files
+   npx wrangler d1 execute labhub-db --file=functions/schema.sql
+   ```
+3. **Build & Deploy to Cloudflare Pages**:
+   ```bash
+   npm run build
+   npx wrangler pages deploy dist --project-name lab-hub
+   ```
+For a detailed step-by-step walkthrough, refer to [Cloudflare Deployment Guide](docs/CLOUDFLARE_DEPLOYMENT.md).
 
 ---
 
-## 🤝 协作开发规范建议
+### 2. Initial Setup & Credentials
 
-1. **新建功能分支**：建议从 `main` 分支切出 feature 分支（例如 `feat/arxiv-tags`、`feat/wechat-webhook`）；
-2. **本地测试验证**：提交代码前请务必运行 `pytest backend/test_api.py` 确保核心逻辑通过；
-3. **发起 Pull Request (PR)**：完成改进后提交 PR，由合作者互相 Code Review 后合并到主分支。
+- **Initial Setup Wizard**:
+  Visit `http://127.0.0.1:8000/setup` (or `/setup` on your deployed domain) on first run to register the **primary Super Admin account**. Once initialized, the setup route is locked down for security.
+- **Lab Registration Invite Code**:
+  New members must provide an invite code during sign-up. The default invite code is: `LAB-2026`. Admins can customize this code anytime in the System Settings or environment variables.
+- **Role Hierarchy**:
+  - **Admin**: System governance, bulk seminar import, role elevation, full feedback management.
+  - **PI / Teacher**: Publish pinned notices, post highlighted recommendations with gold badge, assign seminar speakers.
+  - **Student**: Share literature, fill presentation abstracts, access resource textbooks, and submit feedback.
 
-## 组会、台内报告与文献库（2026-09 更新）
+---
 
-- **arXiv 抓取**：支持纯编号、`arXiv:2609.04305` 和官方 abs/pdf 链接。优先使用官方 Atom API，失败后尝试官方摘要页；读取服务器 `HTTPS_PROXY` / `HTTP_PROXY` 环境配置，超时与连接失败会显示明确原因。
-- **组会时间线**：突出上一次、最近即将举行、下一次组会，可展开全部排期。每场组会包含一位工作汇报主讲人、主讲 Slides，以及零至多位 arXiv 文献分享人；每位分享人可提供编号／链接和可选 Slides。原有“调整排期”及原子批量保存保持可用。
-- **周日程**：切换到“组会与报告 · 周日程”，按北京时间展示周一至周日的组会和台内报告，支持上周、本周、下周切换。手机可横向滚动日程列。
-- **邮件导入**：上传 `.eml`、`.txt`、`.html`（最大 15 MB）或粘贴正文，解析日期、开始时间、标题、报告人、地点和图片／PDF 海报。`.eml` 支持 MIME 附件和 CID 内嵌图片。解析后必须核对并保存；多个海报可手动选择。上传者和管理员可编辑、删除报告。
-- **解析范围**：使用本地规则解析常见中英文带标签邮件，不需要外部 AI 服务。相对日期按邮件发送日期（无发送日期时按今天）解释；不明确或冲突的日期保持空白并提示填写。纯图片中的文字不做 OCR，复杂排版／多场报告应核对后逐场保存。所有日程以北京时间录入。
-- **Slides 与海报**：支持链接及上传 PDF、PPT/PPTX、PNG/JPEG/WebP（每个最大 15 MB），上传文件存于数据库中，读取需要登录；文件与数据库一同备份。解析邮件时选出的附件即上传保存，未保存报告不会生成日程。
-- **文献库**：独立导航入口，自动收录推荐和组会文献；按去除版本号后的 arXiv ID 去重，保留推荐／组会来源标签。可检索编号、标题、作者、摘要和分类，空格分隔的多个词需同时匹配。删除推荐或组会后保留已经收录的文献。抓取失败的组会文献保存链接并标为待补全，支持在文献库重试。
+### 3. Daily Workflows
 
-升级时重新构建前端并重启后端。启动时自动创建新增数据表、幂等补录已有推荐与组会关联文献；无需删除或重建原数据库。
+- **Literature Recommendation**:
+  Click "Recommend Paper" in the dashboard, input an arXiv ID (e.g., `2312.12345`) or DOI. LabHub automatically fetches metadata. Choose **Public** for whole-group discussion or **Directed** for confidential sharing with selected advisors or peers.
+- **Seminar Scheduling & Calendar Sync**:
+  Admins can bulk import semester schedules via CSV. Speakers receive automated dashboard reminders to fill in their title and upload slides. Group members can click "Export iCalendar" to sync all seminar events directly into Apple Calendar, Google Calendar, or Outlook.
+- **Resource Textbook Library**:
+  Browse classic reference textbooks, lecture slides, and GitHub companion repositories with fast alphabetical and pinyin indexing.
 
-```bash
-npm --prefix frontend run build
-.venv/bin/python -m pytest backend -q
-npm --prefix frontend exec -- vitest run frontend/src/utils/schedule.test.js
-```
+---
 
-浏览器回归脚本：先使用独立测试数据库启动服务，再运行（会创建测试组会和报告，请勿指向生产服务）：
+## 4. Copyright, Acknowledgements & Open Source Statement
 
-```bash
-LABHUB_DB_PATH=/tmp/labhub-test.db .venv/bin/uvicorn backend.main:app --port 8011
-LABHUB_TEST_URL=http://127.0.0.1:8011 node frontend/tests/research-workflows.mjs
-```
+### 1. The Vibe Coding Paradigm
 
-脚本默认使用本机 Chrome，自动准备测试文献；结束时清理本次创建的组会、报告和推荐，文献库归档与上传附件仍保留在独立测试库内。
+LabHub is developed following the **Vibe Coding** paradigm — an agile, intent-driven human-AI co-creation methodology. By expressing academic workflow requirements at a high conceptual level and partnering with cutting-edge AI coding agents for full-stack architecture design, algorithm derivation, and automated regression testing, LabHub achieved enterprise-grade robustness and polish in rapid development cycles.
 
-Git 约定：Codex 不执行 `git push`，由用户自行推送；每次推送前必须先 `git pull` 并解决冲突。
+### 2. AI-Assisted Development Acknowledgements
 
-### 收藏、账户与文献推荐
+We gratefully acknowledge the profound assistance of cutting-edge AI coding systems throughout the conception and implementation of LabHub:
+- **OpenAI Codex**: Provided indispensable assistance in async backend API architecture, security permission matrix modeling, comprehensive automated testing suites, and algorithmic edge-case validation.
+- **Google DeepMind Antigravity**: Played an instrumental role in full-stack system architecture, Vue 3 reactive component design, multimodal poster OCR parsing pipelines, and the dual-track Cloudflare Serverless edge architecture.
 
-浏览器脚本书签功能已移除，原侧栏位置改为“我的收藏”。头像菜单的“账户设置”可修改真名、昵称、邮箱、密码并上传头像。修改邮箱与密码需验证当前密码，同时使旧会话失效。头像仅接收 PNG/JPEG/WebP，最大 5 MB，校验后裁切压缩为 256px JPEG。
+### 3. Open Source Ecosystem & Animation Design
 
-文献录入支持 arXiv、DOI 与含 DOI 的期刊链接。DOI 元数据来自 [Crossref REST API](https://www.crossref.org/documentation/retrieve-metadata/rest-api/)；失败或没有 DOI 时可手动填写期刊名称、标题、作者、链接和摘要。不提供 PDF 的期刊显示“期刊原文”，不会虚构 PDF 链接。公开与定向推荐均会归档到对应权限范围的文献库，并支持收藏。
+The visual polish and dynamic user experience of LabHub are built upon the outstanding contributions of the global open-source community. Special thanks to:
+- **Three.js**: Powers the futuristic 3D carousel and immersive interactive poster gallery in our seminar system.
+- **Tailwind CSS & Glassmorphism**: Provides sleek frosted-glass aesthetics, silky transitions, and seamless responsive design across desktop and mobile devices.
+- **KaTeX**: Delivers blazingly fast, typography-grade real-time LaTeX rendering for complex mathematical and physical formulations.
+- **Lucide Icons**: Offers a clean, comprehensive, and consistent modern scientific iconography set.
+- **Vue 3 & FastAPI**: The harmonic integration of modern reactive frontend engineering and high-performance Python async backend architectures.
 
-推荐可选择：
+### 4. 100% Free & Open-Source Non-Profit Statement
 
-- **公开推荐**：全组可见；已有推荐继续按公开处理。
-- **定向推荐**：按姓名／邮箱选择一位或多位其他注册成员，仅发送者和接收者可见。推荐流支持“公共推荐”“推荐给我的”“我发出的”等筛选。同一篇论文可由不同成员分别推荐，也可由同一成员推荐到不同范围；同一发送者向同一接收人集合重复推荐会被提示。
+- **MIT License**: LabHub is licensed under the permissive [MIT License](LICENSE). You are completely free to use, modify, distribute, and self-host this software.
+- **Purely Non-Profit Initiative**: **This project is 100% open-source, permanently free, non-profit, and non-commercial**. It contains zero paid features, no monetization, and no advertisements. Its sole objective is to empower academic laboratories, universities, research institutions, and researchers worldwide with modern, elegant, and zero-cost digital infrastructure.
+- **Community Contributions**: Contributions, issues, and pull requests from researchers and developers worldwide are warmly welcomed!
 
-定向文献只进入相关成员可见的文献库范围；刷新元数据、启动补录不会把它变为公开。相同 arXiv 文献随后被公开推荐或在组会中讨论时，公开的是论文元数据，定向推荐语和接收人仍受保护。共享组会只能关联公开推荐，不能直接挂入定向推荐记录。删除推荐后，已收录的文献和原有可见范围保留。
-
-新增表通过启动时自动建表完成升级，不修改历史推荐内容。验证：
-
-```bash
-.venv/bin/python -m pytest backend -q
-npm --prefix frontend exec -- vitest run frontend/src/utils
-LABHUB_TEST_URL=http://127.0.0.1:8012 node frontend/tests/sharing-workflows.mjs
-```
-
-浏览器测试必须指向独立测试库，使用演示账号；arXiv 预览在该浏览器测试中使用固定响应，实际推荐、成员列表和访问范围走真实后端。
-
-“我发出的”中，推荐人可点击每条推荐的 **编辑可见范围**，在公开与定向之间切换，或替换接收人；保存前可取消，定向范围不得为空。推荐语、文章信息和原发布时间保持不变。文献库按每条推荐的来源分别计算权限：撤回的接收权限不会在重启补录时恢复，但其他推荐／已归档推荐／组会独立授予的收录范围继续保留。共享组会不会展示改为定向后的推荐语或接收人。
-
-编辑可见范围的浏览器验证（独立测试库）：
-
-```bash
-LABHUB_TEST_URL=http://127.0.0.1:8013 node frontend/tests/visibility-workflow.mjs
-```
-
-若“我发出的”出现多位推荐人的内容，请检查后端是否仍是旧进程：旧版 `/api/arxiv/feed` 会忽略 `sent` 并返回完整列表。当前页面从 `/api/auth/me` 获取真实账号，不依赖旧的用户缓存；发现后端返回其他人的推荐时会提示重启。`start.sh` 每次启动都会构建当前前端，更新后仍需重启正在运行的后端进程。
-
-### 测试阶段的数据库 Git 同步（临时方案）
-
-测试阶段可以把 `backend/labhub.db` 纳入 Git，在不同电脑间迁移当前数据。同步前必须停止后端服务并执行一次 SQLite checkpoint，让 WAL 内容写回主数据库：
-
-```bash
-sqlite3 backend/labhub.db 'PRAGMA wal_checkpoint(TRUNCATE);'
-git add backend/labhub.db
-git commit -m "data: update test database"
-git pull --rebase origin main
-git push origin main
-```
-
-另一台电脑执行 `git pull` 后再启动服务。两台电脑不要同时修改数据库；同步前先停止服务，否则 SQLite 的 `-wal` / `-shm` 状态可能不一致。此方式只用于测试数据迁移，真实部署仍应使用同一台服务器上的持久化数据库。
-
-### 初始组会排期与摘要提醒
-
-“组会日程 → 导入组会排期”接收 UTF-8 CSV（最多 200 行），表头：`日期,时间,主讲人,邮箱,主题,地点`，日期为 YYYY-MM-DD，时间为 HH:MM。可省略主题、地点和时间，导入前可核对修改。以邮箱或唯一精确姓名匹配注册账号，未匹配项须手动选择；整批校验通过后才保存，重复排期不会再次导入。
-
-新建或编辑组会也可选择主讲人账号。不要用组织者账号代替主讲人，未关联账号无法提醒。摘要独立于会议纪要，初排可留空，主讲人或管理员可在详情中补充。
-
-站内提醒按北京时间在开始前 7 天至开始时间之间显示，仅提醒已关联主讲账号且摘要为空、未取消或完成的组会。登录、页面重新可见时检查，保持页面打开时每分钟检查；无需邮件配置。改期、重新指派或填写摘要后，提醒自动按最新状态更新。关闭网站时不发送系统推送，下次登录会看到仍待办的提醒。
-
-升级：先停止旧后端并备份数据库，再执行 `./start.sh`。启动会补充缺失字段，保留既有账号与资料；新环境通过 requirements.txt 安装 Pillow 头像处理依赖。不要在旧后端仍运行时替换数据库。
-
-### 反馈回复、PDF 资料与个人组会倒计时
-
-- 老师和组员从侧栏“我的反馈”提交问题、查看状态和管理员回复；管理员从“反馈管理”读取全部问题，发送处理说明，可同时标记处理完成，也可保留待处理。回复只对管理员和原提交人可见，首页提示未读回复。
-- “资料整合 → 添加资料”支持上传不超过 15 MB 的 PDF，也可填写下载链接。文件保存在 SQLite 的 `uploaded_files`，使用登录认证读取。
-- 首页分别展示本人下一次主讲和 arXiv 分享的剩余天数（北京时间）。编辑组会时为分享人选择注册账号；旧数据只在姓名唯一匹配时识别。取消、完成、重新分配和改期会同步反映在倒计时中。
-- 更新后需重启 `./start.sh`，启动时自动补充分享人账号字段并建立反馈回复表，保留已有数据。测试数据库由 `backend/conftest.py` 隔离，测试不会写入日常 `backend/labhub.db`。
