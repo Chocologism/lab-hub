@@ -1,0 +1,2 @@
+<script setup>defineProps({ message: { type: String, default: '正在加载' }, cards: { type: Number, default: 3 } })</script>
+<template><div role="status" :aria-label="message" class="skeleton-list"><div v-for="i in cards" :key="i" class="skeleton-card"><div class="skeleton w-24 h-3 mb-5"/><div class="skeleton w-3/4 h-5 mb-3"/><div class="skeleton w-1/2 h-3"/></div><span class="sr-only">{{ message }}</span></div></template>

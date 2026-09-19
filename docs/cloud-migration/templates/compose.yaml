@@ -1,0 +1,68 @@
+# Copy to /srv/lab-hub/ops/compose.yaml after completing README stages 1–4.
+# There is deliberately no build directive and no public application port.
+services:
+  app:
+    image: ${APP_IMAGE:?Set a tested release image tag or digest}
+    restart: unless-stopped
+    init: true
+    user: "10001:10001"
+    env_file:
+      - /srv/lab-hub/config/app.env
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - type: bind
+        source: /srv/lab-hub/data
+        target: /app/data
+        bind:
+          create_host_path: false
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 256
+    mem_limit: 2g
+    stop_grace_period: 60s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import json,urllib.request; r=json.load(urllib.request.urlopen('http://127.0.0.1:8000/api/ready',timeout=4)); assert r['status']=='ready'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  caddy:
+    image: ${CADDY_IMAGE:?Set a verified Caddy image digest}
+    restart: unless-stopped
+    environment:
+      LABHUB_DOMAIN: ${LABHUB_DOMAIN:?Set the real domain}
+      ACME_EMAIL: ${ACME_EMAIL:?Set an account recovery email}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - type: bind
+        source: /srv/lab-hub/ops/Caddyfile
+        target: /etc/caddy/Caddyfile
+        read_only: true
+        bind:
+          create_host_path: false
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  caddy_data:
+  caddy_config:

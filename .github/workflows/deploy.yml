@@ -1,0 +1,43 @@
+name: Deploy LabHub to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: 检出代码 (Checkout)
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js 环境 (Node 22)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 安装前端依赖 (Install Dependencies)
+        run: |
+          cd frontend
+          npm ci
+
+      - name: 构建前端生产包 (Build Frontend)
+        run: |
+          cd frontend
+          npm run build
+
+      - name: 部署到 Cloudflare Pages (Deploy via Wrangler)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          cd frontend
+          npx wrangler pages deploy ./dist --project-name=labhub --branch=main
+

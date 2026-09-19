@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  lab-hub:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: lab-hub-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      # 持久化数据库目录，容器重建或升级时数据不丢失
+      - ./data:/app/data
+    environment:
+      - LABHUB_INVITE_CODE=LAB-2026
+      - LABHUB_SECRET_KEY=labhub-secret-key-prod-2026
+      - LABHUB_DB_PATH=/app/data/labhub.db

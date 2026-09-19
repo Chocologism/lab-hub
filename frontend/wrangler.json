@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lab-hub-preview",
+  "compatibility_date": "2024-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "./dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "lab-hub-db",
+      "database_id": "lab-hub-d1-placeholder-id"
+    }
+  ],
+  "vars": {
+    "JWT_SECRET": "lab-hub-secure-secret-key-generic",
+    "INVITE_CODE": "LAB-2026"
+  }
+}

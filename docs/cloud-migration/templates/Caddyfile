@@ -1,0 +1,28 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$LABHUB_DOMAIN} {
+	request_body {
+		max_size 20MB
+	}
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+		-Server
+	}
+
+	# Keep the mailbox progress stream uncompressed and promptly flushed.
+	@mailstream path /api/mailbox/sync-stream
+	handle @mailstream {
+		reverse_proxy app:8000 {
+			flush_interval -1
+		}
+	}
+
+	handle {
+		encode zstd gzip
+		reverse_proxy app:8000
+	}
+}

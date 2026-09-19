@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="background-color: #081f28;">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function() {
+        try {
+          var savedScheme = localStorage.getItem('labhub_color_scheme');
+          var savedBg = localStorage.getItem('labhub_bg_type');
+          var savedLegacy = localStorage.getItem('labhub_theme_style');
+
+          var scheme = (savedScheme === 'nebula-purple' || savedScheme === 'classic-cyan' || savedScheme === 'custom')
+            ? savedScheme
+            : (savedLegacy === 'galaxy' ? 'nebula-purple' : 'classic-cyan');
+
+          var bgType = (savedBg === 'vanta-fog' || savedBg === 'galaxy' || savedBg === 'clouds-static' || savedBg === 'custom-local')
+            ? savedBg
+            : ((savedLegacy === 'vanta-fog' || savedLegacy === 'galaxy' || savedLegacy === 'clouds-static')
+                ? savedLegacy
+                : 'clouds-static');
+
+          var legacyStyle = scheme === 'nebula-purple' ? 'galaxy' : (scheme === 'custom' ? 'custom' : 'vanta-fog');
+          var bgHex = scheme === 'nebula-purple' ? '#03020a' : '#081f28';
+
+          var doc = document.documentElement;
+          doc.setAttribute('data-color-scheme', scheme);
+          doc.setAttribute('data-bg-type', bgType);
+          doc.setAttribute('data-theme-style', legacyStyle);
+          doc.setAttribute('data-bg-style', bgType);
+
+          if (scheme === 'custom') {
+            try {
+              var rawCustom = localStorage.getItem('labhub_custom_color_scheme');
+              if (rawCustom) {
+                var c = JSON.parse(rawCustom);
+                if (c.baseColor) {
+                  bgHex = c.baseColor;
+                  doc.style.setProperty('--bg', c.baseColor);
+                }
+                if (c.primaryColor) {
+                  doc.style.setProperty('--accent', c.primaryColor);
+                  doc.style.setProperty('--focus', c.primaryColor);
+                }
+                if (c.panelColor) doc.style.setProperty('--panel', c.panelColor);
+                if (c.panelHex) doc.style.setProperty('--panel-solid', c.panelHex);
+                if (c.surfaceColor) doc.style.setProperty('--surface', c.surfaceColor);
+                if (c.lineColor) doc.style.setProperty('--line', c.lineColor);
+                if (c.accentInk) doc.style.setProperty('--accent-ink', c.accentInk);
+                if (c.accentStrong) doc.style.setProperty('--accent-strong', c.accentStrong);
+                if (c.raised) doc.style.setProperty('--raised', c.raised);
+                if (c.glass) doc.style.setProperty('--glass', c.glass);
+              }
+            } catch (err) {}
+          }
+
+          doc.style.backgroundColor = bgHex;
+          if (bgType === 'clouds-static') {
+            doc.style.backgroundImage = "url('/assets/forecast/forecast-clouds-drift-seamless.jpg')";
+            doc.style.backgroundPosition = "center center";
+            doc.style.backgroundSize = "cover";
+            doc.style.backgroundRepeat = "no-repeat";
+          } else {
+            doc.style.backgroundImage = 'none';
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f172a'><path d='M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="x5-fullscreen" content="true" />
+    <meta name="x5-page-mode" content="app" />
+    <meta name="browsermode" content="application" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#081f28" />
+    <link rel="preload" as="image" href="/assets/forecast/forecast-clouds-drift-seamless.jpg" />
+    <title>Lab-Hub | 课题组科研协作平台</title>
+    
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      html {
+        background-color: #081f28;
+        min-height: 100%;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: inherit;
+        color: #f5f8f6;
+        min-height: 100%;
+      }
+      html[data-bg-style="clouds-static"],
+      html[data-bg-style="clouds-static"] body,
+      html[data-bg-type="clouds-static"],
+      html[data-bg-type="clouds-static"] body {
+        background-color: #081f28;
+        background-image: url('/assets/forecast/forecast-clouds-drift-seamless.jpg');
+        background-position: center center;
+        background-size: cover;
+        background-repeat: no-repeat;
+      }
+      html[data-color-scheme="classic-cyan"],
+      html[data-color-scheme="classic-cyan"] body,
+      html[data-theme-style="vanta-fog"],
+      html[data-theme-style="vanta-fog"] body {
+        background-color: #081f28;
+      }
+      html[data-color-scheme="nebula-purple"],
+      html[data-color-scheme="nebula-purple"] body,
+      html[data-theme-style="galaxy"],
+      html[data-theme-style="galaxy"] body {
+        background-color: #03020a;
+        background-image: none;
+        color: #f8fafc;
+      }
+      #app {
+        min-height: 100vh;
+        min-height: 100dvh;
+        background-color: transparent;
+      }
+    </style>
+    
+    <!-- 优先使用系统原生高质量排版字体栈，避免外网字体请求阻塞页面渲染 -->
+    <script>
+      (function() {
+        function hideWechatToolbar() {
+          if (typeof WeixinJSBridge !== 'undefined' && WeixinJSBridge.call) {
+            WeixinJSBridge.call('hideToolbar');
+          }
+        }
+        if (typeof WeixinJSBridge === 'undefined') {
+          document.addEventListener('WeixinJSBridgeReady', hideWechatToolbar, false);
+        } else {
+          hideWechatToolbar();
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen antialiased">
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
