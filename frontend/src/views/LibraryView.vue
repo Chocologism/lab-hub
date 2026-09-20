@@ -120,7 +120,7 @@ onMounted(async () => {
         <span v-if="paper.primary_category" class="badge">{{ paper.primary_category }}</span>
       </div>
       <h2 class="academic"><a :href="paperSource(paper)" target="_blank" rel="noreferrer" v-html="renderLatex(paper.title)"></a></h2>
-      <p class="muted">{{ paper.authors.join(' · ') }} <span v-if="paper.published_date">· {{ paper.published_date }}</span></p>
+      <p class="muted">{{ Array.isArray(paper.authors) ? paper.authors.join(' · ') : (paper.authors || '') }} <span v-if="paper.published_date">· {{ paper.published_date }}</span></p>
       <p class="abstract" v-html="renderLatex(paper.abstract || '已保存文献链接，元数据待补全。')"></p>
       <div class="paper-actions">
         <a class="button small secondary" :href="paperRead(paper)" target="_blank" rel="noreferrer">{{ paperReadLabel(paper) }}</a>

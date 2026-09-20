@@ -19,7 +19,7 @@ import {
 } from './demoData'
 
 const STORAGE_KEYS = {
-  VERSION: 'laborbit_demo_version_v2',
+  VERSION: 'laborbit_demo_version_v3',
   SEMINARS: 'laborbit_demo_seminars',
   PAPERS: 'laborbit_demo_papers',
   NOTICES: 'laborbit_demo_notices',
@@ -39,9 +39,9 @@ const STORAGE_KEYS = {
 export function initDemoStorage(force = false) {
   if (typeof localStorage === 'undefined') return
 
-  const isCurrentVersion = localStorage.getItem(STORAGE_KEYS.VERSION) === '2.0'
+  const isCurrentVersion = localStorage.getItem(STORAGE_KEYS.VERSION) === '3.0'
   if (!isCurrentVersion || force) {
-    localStorage.setItem(STORAGE_KEYS.VERSION, '2.0')
+    localStorage.setItem(STORAGE_KEYS.VERSION, '3.0')
     localStorage.setItem(STORAGE_KEYS.SEMINARS, JSON.stringify(DEMO_SEMINARS))
     localStorage.setItem(STORAGE_KEYS.PAPERS, JSON.stringify(DEMO_ARXIV_PAPERS))
     localStorage.setItem(STORAGE_KEYS.NOTICES, JSON.stringify(DEMO_NOTICES))
@@ -481,13 +481,39 @@ export async function demoAxiosAdapter(config) {
   // 5. 公共文献库 (Library)
   if (cleanUrl === '/api/library') {
     let lib = getStored(STORAGE_KEYS.LIBRARY, DEMO_LIBRARY_PAPERS)
+    // 保证每个 paper 的 authors 为数组，防御历史缓存数据中格式不匹配
+    lib = lib.map(p => ({
+      ...p,
+      authors: Array.isArray(p.authors) ? p.authors : (typeof p.authors === 'string' ? p.authors.split(',').map(s => s.trim()) : [])
+    }))
     const q = (getParam('q') || '').toLowerCase().trim()
+    const src = getParam('source') || 'all'
+    if (src === 'recommendation') {
+      lib = lib.filter(p => p.from_recommendation)
+    } else if (src === 'seminar') {
+      lib = lib.filter(p => p.from_seminar)
+    } else if (src === 'direct') {
+      lib = lib.filter(p => p.from_direct)
+    }
     if (q) {
-      lib = lib.filter(p => (p.title || '').toLowerCase().includes(q) || (p.authors || '').toLowerCase().includes(q))
+      lib = lib.filter(p => {
+        const titleMatch = (p.title || '').toLowerCase().includes(q)
+        const authorsMatch = (p.authors || []).some(a => a.toLowerCase().includes(q))
+        const arxivMatch = (p.arxiv_id || '').toLowerCase().includes(q)
+        const abstractMatch = (p.abstract || '').toLowerCase().includes(q)
+        return titleMatch || authorsMatch || arxivMatch || abstractMatch
+      })
     }
     return respond(lib)
   }
+  if (cleanUrl.match(/\/api\/library\/(\d+)\/refresh/) && method === 'post') {
+    return respond({ success: true, message: '文献信息已补全' })
+  }
   if (cleanUrl.match(/\/api\/library\/(\d+)$/) && method === 'delete') {
+    const pId = parseInt(cleanUrl.match(/\/api\/library\/(\d+)$/)[1], 10)
+    let lib = getStored(STORAGE_KEYS.LIBRARY, DEMO_LIBRARY_PAPERS)
+    lib = lib.filter(p => p.id !== pId)
+    setStored(STORAGE_KEYS.LIBRARY, lib)
     return respond({ success: true })
   }
 

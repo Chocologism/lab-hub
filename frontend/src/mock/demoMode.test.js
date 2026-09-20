@@ -76,6 +76,10 @@ describe('Demo Mode & Mock Adapter', () => {
     expect(libRes.status).toBe(200)
     expect(Array.isArray(libRes.data)).toBe(true)
     expect(libRes.data.length).toBeGreaterThanOrEqual(2)
+    libRes.data.forEach(p => {
+      expect(Array.isArray(p.authors)).toBe(true)
+      expect(() => p.authors.join(' · ')).not.toThrow()
+    })
 
     // 2. Resource hub categories & books
     const catRes = await demoAxiosAdapter({ url: '/api/resources/categories', method: 'get' })
