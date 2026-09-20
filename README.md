@@ -7,6 +7,10 @@
 </p>
 
 <p align="center">
+  <a href="https://chocologism.github.io/lab-orbit/"><img src="https://img.shields.io/badge/Live%20Demo-LabOrbit%20Online-6366f1?style=for-the-badge&logo=githubpages&logoColor=white" alt="Live Demo"></a>
+</p>
+
+<p align="center">
   <a href="#-中文文档"><img src="https://img.shields.io/badge/文档-简体中文-blue.svg" alt="Chinese Doc"></a>
   <a href="#-english-documentation"><img src="https://img.shields.io/badge/Document-English-green.svg" alt="English Doc"></a>
   <img src="https://img.shields.io/badge/License-MIT-emerald.svg" alt="License">
@@ -23,12 +27,14 @@
 ## 快速导航 / Quick Navigation
 
 - [🇨🇳 中文文档](#-中文文档)
+  - [在线演示 (Live Demo)](#在线演示-live-demo)
   - [一、项目初衷 (Motivation)](#一项目初衷-motivation)
   - [二、模块设计与系统架构 (Architecture)](#二模块设计与系统架构-architecture)
   - [三、使用手册与快速上手 (User Manual)](#三使用手册与快速上手-user-manual)
   - [四、版权、致谢与开源声明 (Copyright & Acknowledgements)](#四版权致谢与开源声明-copyright--acknowledgements)
   - [五、赞助与支持 (Buy Me a Coffee)](#五赞助与支持-buy-me-a-coffee)
 - [🇬🇧 English Documentation](#-english-documentation)
+  - [Online Demo (Live Preview)](#online-demo-live-preview)
   - [1. Motivation](#1-motivation)
   - [2. Modular Design & Architecture](#2-modular-design--architecture)
   - [3. User Manual & Getting Started](#3-user-manual--getting-started)
@@ -38,6 +44,20 @@
 ---
 
 # 🇨🇳 中文文档
+
+## 在线演示 (Live Demo)
+
+无需配置或搭建后端，即可直接在浏览器体验课题组“已正常使用一段时间”后的真实视觉设计与交互流程：
+
+👉 **[点击直接体验 LabOrbit 在线演示版 (GitHub Pages)](https://chocologism.github.io/lab-orbit/)**
+
+- **免密秒进**：无需注册或登录，默认以组员「陈晨（博士生）」身份直接进入完整工作台；
+- **全套预置数据**：预填天体物理与交叉科学课题组真实学术数据（组会排期、arXiv 推荐精选、通知公告、研讨评论与经典教材）；
+- **新手引导向导**：右下角常驻演示浮窗，点击 `🎓 功能向导` 即可启动完整的高亮交互式漫游向导；
+- **多角色切换**：浮窗内支持在「导师 / PI」与「学生 / 组员」视角间一键切换；
+- **纯前端沙盒**：数据变更保存在浏览器本地（`localStorage`），随时可点击 `🔄 重置` 恢复出厂状态。
+
+---
 
 ## 一、项目初衷 (Motivation)
 
@@ -246,6 +266,20 @@ docker compose -f deploy/docker-compose.yml up -d
 ---
 
 # 🇬🇧 English Documentation
+
+## Online Demo (Live Preview)
+
+Experience the visual design and full interactive workflow without deploying any backend:
+
+👉 **[Launch LabOrbit Live Demo (GitHub Pages)](https://chocologism.github.io/lab-orbit/)**
+
+- **Instant Zero-Auth Access**: Jump straight into the full research dashboard as student researcher "Chen Chen (PhD Student)";
+- **Realistic Preloaded Dataset**: Seeded with astrophysics research group data including scheduled seminars, curated arXiv preprints, announcements, and resources;
+- **Interactive Tour**: Launch the `🎓 Feature Tour` from the bottom-right demo floating pill for a guided walkthrough of core features;
+- **Role Switching**: Effortlessly toggle between "Mentor / PI" and "Student / Researcher" perspectives;
+- **Local Sandbox**: Data modifications are saved in your browser (`localStorage`) with a one-click `🔄 Reset` to factory state.
+
+---
 
 ## 1. Motivation
 

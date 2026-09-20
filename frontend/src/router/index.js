@@ -66,14 +66,20 @@ const routes = [
   },
 ]
 
+import { isDemoMode, initDemoAuth } from '../mock/isDemo'
+
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
 import { useSiteConfig } from '../composables/useSiteConfig'
 
 router.beforeEach(async (to, from, next) => {
+  if (isDemoMode()) {
+    initDemoAuth()
+  }
+
   const { siteConfig, fetchSiteStatus } = useSiteConfig()
 
   if (siteConfig.initialized === null) {

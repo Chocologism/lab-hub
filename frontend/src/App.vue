@@ -18,6 +18,7 @@ const isHome = computed(() => route.path === '/')
 const isPinned = ref(localStorage.getItem('sidebar_pinned') === 'true')
 
 import SystemTutorialModal from './components/SystemTutorialModal.vue'
+import DemoModeBanner from './components/DemoModeBanner.vue'
 import { useTutorial } from './composables/useTutorial'
 import { authApi } from './api/client'
 
@@ -69,6 +70,7 @@ function onUpdatePinned(val) {
     <MobileNavBar v-if="showNavbar" />
     <FeedbackHost />
     <SystemTutorialModal />
+    <DemoModeBanner />
   </div>
 </template>
 

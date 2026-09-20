@@ -1,0 +1,58 @@
+name: Deploy LabOrbit Demo to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码 (Checkout)
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js 环境 (Node 22)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 安装前端依赖 (Install Dependencies)
+        run: |
+          cd frontend
+          npm ci
+
+      - name: 构建 GitHub Pages 演示版 (Build Demo Frontend)
+        env:
+          GITHUB_PAGES: 'true'
+          VITE_DEMO_MODE: 'true'
+        run: |
+          cd frontend
+          npm run build
+
+      - name: 配置 GitHub Pages (Setup Pages)
+        uses: actions/configure-pages@v5
+
+      - name: 上传构建产物 (Upload Pages Artifact)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+      - name: 部署到 GitHub Pages (Deploy to GitHub Pages)
+        id: deployment
+        uses: actions/deploy-pages@v4

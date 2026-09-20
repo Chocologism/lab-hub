@@ -2,6 +2,19 @@
 <html lang="zh-CN" style="background-color: #081f28;">
   <head>
     <meta charset="UTF-8" />
+    <!-- Single Page Apps for GitHub Pages: 恢复 404.html 重定向路径 -->
+    <script type="text/javascript">
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
     <script>
       (function() {
         try {
@@ -54,8 +67,9 @@
           }
 
           doc.style.backgroundColor = bgHex;
+          var basePath = window.location.pathname.startsWith('/lab-orbit') ? '/lab-orbit' : '';
           if (bgType === 'clouds-static') {
-            doc.style.backgroundImage = "url('/assets/forecast/forecast-clouds-drift-seamless.jpg')";
+            doc.style.backgroundImage = "url('" + basePath + "/assets/forecast/forecast-clouds-drift-seamless.jpg')";
             doc.style.backgroundPosition = "center center";
             doc.style.backgroundSize = "cover";
             doc.style.backgroundRepeat = "no-repeat";

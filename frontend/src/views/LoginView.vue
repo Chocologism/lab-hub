@@ -74,6 +74,14 @@
               <button class="button button-primary submit-btn" :disabled="loading">
                 {{ loading ? '验证中…' : '登录并继续' }}
               </button>
+              <button
+                v-if="isDemo"
+                type="button"
+                class="button button-secondary demo-direct-btn"
+                @click="enterDemoMode"
+              >
+                🚀 免密一键体验 (进入演示工作台)
+              </button>
             </form>
           </section>
 
@@ -161,6 +169,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { authApi } from '../api/client'
 import WaveInput from '../components/WaveInput.vue'
 import { useSiteConfig } from '../composables/useSiteConfig'
+import { isDemoMode, initDemoAuth } from '../mock/isDemo'
+
+const isDemo = computed(() => isDemoMode())
+
+function enterDemoMode() {
+  initDemoAuth()
+  router.push('/')
+}
 
 const { siteConfig } = useSiteConfig()
 const router = useRouter()
@@ -726,6 +742,23 @@ const handleRegister = async () => {
   border: 1px solid rgba(218, 238, 235, 0.22) !important;
   background: rgba(14, 38, 48, 0.78) !important;
   box-shadow: 0 20px 48px -8px rgba(3, 15, 21, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
+}
+
+.demo-direct-btn {
+  margin-top: 10px;
+  width: 100%;
+  background: rgba(99, 102, 241, 0.15) !important;
+  border: 1px solid rgba(99, 102, 241, 0.4) !important;
+  color: #c7d2fe !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.demo-direct-btn:hover {
+  background: rgba(99, 102, 241, 0.25) !important;
+  border-color: rgba(99, 102, 241, 0.7) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
 }
 
 [data-color-scheme="custom"] .brand-logo-emblem {

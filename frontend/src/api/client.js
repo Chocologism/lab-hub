@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { applyViewMode } from '../composables/useAdminMode'
+import { isDemoMode, initDemoAuth } from '../mock/isDemo'
+import { demoAxiosAdapter } from '../mock/demoAdapter'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || ''
 
@@ -7,6 +9,11 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
 })
+
+if (isDemoMode()) {
+  initDemoAuth()
+  api.defaults.adapter = demoAxiosAdapter
+}
 
 // 请求拦截器：自动注入 Bearer Token
 api.interceptors.request.use((config) => {
@@ -23,10 +30,12 @@ api.interceptors.response.use(
   (error) => {
     const isAuthMe404 = error.response && error.response.status === 404 && error.config?.url?.includes('/api/auth/me')
     if (error.response && (error.response.status === 401 || isAuthMe404)) {
-      localStorage.removeItem('labhub_token')
-      localStorage.removeItem('labhub_user')
-      if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/quick-share')) {
-        window.location.href = '/login'
+      if (!isDemoMode()) {
+        localStorage.removeItem('labhub_token')
+        localStorage.removeItem('labhub_user')
+        if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/quick-share')) {
+          window.location.href = '/login'
+        }
       }
     }
     const detail = error.response?.data?.detail
