@@ -91,6 +91,7 @@ function logout() {
     <header class="mobile-header">
       <div class="mobile-header-inner">
         <router-link to="/" class="mobile-brand" aria-label="返回工作台">
+          <img src="/assets/LO_logo.svg" alt="LabOrbit Logo" class="mobile-brand-logo" />
           <span class="brand-badge">{{ siteConfig.labShortName }}</span>
           <span class="brand-title">{{ currentTitle }}</span>
         </router-link>
@@ -205,6 +206,14 @@ function logout() {
     gap: 10px;
     text-decoration: none;
     color: var(--text, #ffffff);
+  }
+
+  .mobile-brand-logo {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px rgba(187, 144, 252, 0.45));
+    flex-shrink: 0;
   }
 
   .brand-badge {

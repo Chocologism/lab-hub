@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1254" height="1254" viewBox="0 0 1254 1254" role="img" aria-label="LabOrbit symbol">
+<title>LabOrbit symbol</title>
+<desc>Transparent vector reconstruction from the supplied artwork. All shapes and lettering are editable vector paths; no raster images or external fonts.</desc>
+<defs><linearGradient id="lavender" x1="0" y1="0" x2="0.75" y2="1"><stop stop-color="#bb90fc"/><stop offset="1" stop-color="#b78afa"/></linearGradient><linearGradient id="pearl" x1="0" y1="0" x2="0.75" y2="1"><stop stop-color="#f7f9ff"/><stop offset="1" stop-color="#f3f5fb"/></linearGradient><linearGradient id="violet" x1="0" y1="0" x2="0.75" y2="1"><stop stop-color="#6c34fe"/><stop offset="1" stop-color="#632efa"/></linearGradient></defs>
+<path id="orbit-upper" fill="url(#lavender)" fill-rule="evenodd" d="M 688,338 C 791,306 899,312 982,347 L 963,387 C 889,357 799,353 720,370 C 713,372 708,372 702,368 L 681,354 C 675,350 677,342 688,338 Z"/>
+<path id="orbit-right" fill="url(#lavender)" fill-rule="evenodd" d="M 1080,422 C 1111,456 1131,497 1128,544 C 1127,633 1058,730 939,809 C 933,813 927,815 924,811 C 921,808 924,790 924,779 C 924,774 926,771 931,767 C 1018,699 1068,624 1065,546 C 1065,510 1055,481 1036,460 Z"/>
+<path id="orbit-left" fill="url(#lavender)" fill-rule="evenodd" d="M 350,542 C 357,537 365,537 366,545 L 366,568 C 366,574 363,578 357,583 C 267,654 218,720 218,779 C 218,880 311,947 532,932 C 538,931 542,932 547,936 L 565,948 C 574,954 571,962 560,964 C 357,1007 190,962 154,853 C 117,741 229,630 350,542 Z"/>
+<path id="monogram-purple" fill="url(#lavender)" fill-rule="evenodd" d="M 510,410 C 526,400 543,409 543,427 L 543,725 C 543,740 546,747 558,755 L 758,875 C 774,884 773,900 758,909 L 660,963 C 649,969 639,969 628,962 L 404,829 C 386,818 380,807 380,786 L 380,513 C 380,491 385,480 404,469 Z"/>
+<path id="monogram-white" fill="url(#pearl)" fill-rule="evenodd" d="M 606,359 C 620,350 629,350 642,357 L 880,495 C 900,507 909,527 909,551 L 909,807 C 909,829 904,841 888,850 L 849,873 C 838,879 828,879 817,873 L 722,817 C 708,809 710,795 723,787 L 785,751 C 794,746 798,740 798,730 L 798,592 C 798,582 795,576 786,571 L 673,504 C 663,498 655,501 647,506 L 593,536 C 578,544 563,536 563,519 L 563,406 C 563,390 569,380 581,373 Z"/>
+<ellipse id="nucleus" cx="669" cy="664" rx="98.5" ry="98" fill="url(#violet)"/>
+<ellipse id="satellite-ring" cx="1025" cy="397" rx="66" ry="66.5" fill="url(#pearl)"/>
+<ellipse id="satellite-core" cx="1024.5" cy="397" rx="34.5" ry="34.5" fill="url(#violet)"/>
+</svg>

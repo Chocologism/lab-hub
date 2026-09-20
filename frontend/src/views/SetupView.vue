@@ -124,6 +124,9 @@ async function handleCompleteSetup() {
     <div class="setup-card">
       <!-- 头部介绍 -->
       <div class="setup-header">
+        <div class="setup-logo-wrap">
+          <img src="/assets/LO_logo.svg" alt="LabOrbit Logo" class="setup-logo-img" />
+        </div>
         <div class="setup-badge">
           <AppIcon name="sparkles" class="badge-icon" />
           <span>首次部署向导</span>
@@ -341,6 +344,28 @@ body.dark .setup-card,
 .setup-header {
   text-align: center;
   margin-bottom: 28px;
+}
+
+.setup-logo-wrap {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(187, 144, 252, 0.22) 0%, rgba(12, 10, 26, 0.85) 100%);
+  border: 1.5px solid rgba(187, 144, 252, 0.4);
+  box-shadow: 0 0 24px rgba(187, 144, 252, 0.35), 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.setup-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(187, 144, 252, 0.45));
 }
 
 .setup-badge {

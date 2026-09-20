@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="docs/images/logo.png" alt="LabOrbit Logo" width="140" style="border-radius: 20px;" />
+  <img src="docs/images/LO_logo_wide.svg" alt="LabOrbit Logo" width="500" />
 </p>
-
-<h1 align="center">LabOrbit</h1>
 
 <p align="center">
   <strong>学术课题组科研协作平台 / Academic Research Lab Hub</strong>

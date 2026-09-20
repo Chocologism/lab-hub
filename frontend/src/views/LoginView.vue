@@ -5,7 +5,7 @@
       <header class="login-brand-header">
         <div class="brand-badge-wrap">
           <div class="brand-logo-emblem">
-            <span>{{ siteConfig.labShortName }}</span>
+            <img src="/assets/LO_logo.svg" alt="LabOrbit Logo" class="brand-logo-img" />
           </div>
           <h1 class="brand-name">{{ siteConfig.labName }}</h1>
         </div>
@@ -305,20 +305,25 @@ const handleRegister = async () => {
 }
 
 .brand-logo-emblem {
-  width: 50px;
-  height: 50px;
+  width: 52px;
+  height: 52px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #f3e8ff 0%, #c084fc 100%);
+  background: radial-gradient(circle, rgba(187, 144, 252, 0.22) 0%, rgba(12, 10, 26, 0.85) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: #070314;
-  border: 2px solid rgba(255, 255, 255, 0.75);
-  box-shadow: 0 0 28px rgba(192, 132, 252, 0.45), 0 4px 14px rgba(0, 0, 0, 0.5);
+  border: 1.5px solid rgba(187, 144, 252, 0.45);
+  box-shadow: 0 0 24px rgba(192, 132, 252, 0.45), 0 4px 14px rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(187, 144, 252, 0.45));
 }
 
 .brand-name {
@@ -674,9 +679,8 @@ const handleRegister = async () => {
    水波云雾风格还原 (Vanta Fog / Clouds Static)
    ========================================================================== */
 [data-theme-style="vanta-fog"] .brand-logo-emblem {
-  background: linear-gradient(135deg, #c5e6df 0%, #edf9f5 100%) !important;
-  color: #0c262c !important;
-  border: 2px solid rgba(255, 255, 255, 0.7) !important;
+  background: radial-gradient(circle, rgba(197, 230, 223, 0.25) 0%, rgba(14, 38, 48, 0.85) 100%) !important;
+  border: 1.5px solid rgba(197, 230, 223, 0.5) !important;
   box-shadow: 0 0 24px rgba(197, 230, 223, 0.5), 0 4px 14px rgba(0, 0, 0, 0.25) !important;
 }
 
@@ -709,8 +713,8 @@ const handleRegister = async () => {
 }
 
 [data-color-scheme="custom"] .brand-logo-emblem {
-  background: linear-gradient(135deg, var(--accent-strong, var(--accent)) 0%, var(--accent) 100%) !important;
-  color: var(--accent-ink, #070314) !important;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent) 0%, rgba(12, 10, 26, 0.85) 100%) !important;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 55%, transparent) !important;
   box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 45%, transparent), 0 4px 14px rgba(0, 0, 0, 0.5) !important;
 }
 </style>

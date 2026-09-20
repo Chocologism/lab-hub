@@ -313,7 +313,10 @@ function logout() {
           </div>
         </div>
 
-        <router-link to="/" class="sidebar-brand" :aria-label="siteConfig.labName + '首页'">{{ siteConfig.labShortName }}</router-link>
+        <router-link to="/" class="sidebar-brand" :aria-label="siteConfig.labName + '首页'">
+          <img src="/assets/LO_logo.svg" alt="LabOrbit Logo" class="sidebar-brand-logo" />
+          <span class="sidebar-brand-text">{{ siteConfig.labShortName }}</span>
+        </router-link>
       </div>
 
       <nav class="sidebar-links" aria-label="主导航">
@@ -596,6 +599,32 @@ function logout() {
 
 .sidebar-top .sidebar-brand {
   margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sidebar-brand-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(187, 144, 252, 0.45));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sidebar-brand:hover .sidebar-brand-logo {
+  transform: scale(1.14) rotate(8deg);
+}
+
+.sidebar-brand-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  line-height: 1;
 }
 
 /* sour-rabbit-84 拟物图钉样式 */
