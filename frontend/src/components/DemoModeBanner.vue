@@ -8,7 +8,7 @@ const isDemo = computed(() => isDemoMode())
 const isCollapsed = ref(false)
 const currentUser = ref(null)
 
-const { openTutorial } = useTutorial()
+const { openTutorial, showTutorial } = useTutorial()
 
 function refreshCurrentUser() {
   try {
@@ -41,7 +41,7 @@ function handleToggleRole() {
 </script>
 
 <template>
-  <div v-if="isDemo" class="demo-banner-container">
+  <div v-if="isDemo && !showTutorial" class="demo-banner-container">
     <!-- 折叠状态小胶囊 -->
     <div
       v-if="isCollapsed"
@@ -127,9 +127,10 @@ function handleToggleRole() {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 99999;
+  z-index: 9990;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   user-select: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .demo-pill-collapsed {

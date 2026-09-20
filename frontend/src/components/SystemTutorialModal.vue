@@ -41,7 +41,19 @@ const targetElement = ref(null)
 const isOnTargetRoute = computed(() => {
   const targetRoute = currentSubStep.value?.targetRoute || currentStep.value?.targetRoute
   if (!targetRoute) return true
-  return route.path === targetRoute
+  if (route.fullPath === targetRoute || route.path === targetRoute) return true
+
+  const [targetPath, queryString] = targetRoute.split('?')
+  if (route.path !== targetPath) return false
+  if (!queryString) return true
+
+  const searchParams = new URLSearchParams(queryString)
+  for (const [k, v] of searchParams.entries()) {
+    if (String(route.query[k] || '') !== String(v || '')) {
+      return false
+    }
+  }
+  return true
 })
 
 // 计算镂空区域坐标与尺寸（适度内边距与圆角）

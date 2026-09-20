@@ -199,7 +199,7 @@ const GENERAL_STEPS = [
         subtitle: '跨设备日历订阅',
         description: '点击【导出到日历】生成标准 .ics 文件，直接导入至 macOS / iOS 手机日历、Outlook 或 Google Calendar。',
         purposeNote: '将组会与学术报告一键同步至手机，防止遗忘。',
-        actionPrompt: '需要将日程同步至手机时，点击【导出到日历】即可生成文件'
+        actionPrompt: '点击下方【下一步】继续导览；需要将日程同步至手机时，点击【导出到日历】即可生成文件'
       },
       {
         id: 'schedule_conferences_tab',
