@@ -380,7 +380,7 @@ async function saveVisibility() {
   finally { savingVisibility.value = false }
 }
 const toggleAbstract = (id) => { expandedAbstracts.value[id] = !expandedAbstracts.value[id] }
-const canDelete = (paper) => currentUser.value && (currentUser.value.role === 'admin' || currentUser.value.id === paper.recommender.id)
+const canDelete = (paper) => currentUser.value && (currentUser.value.role === 'admin' || currentUser.value.id === (paper.recommender?.id || paper.recommended_by_id))
 
 function onCommentAdded(paper, comment) {
   if (!comment || !comment.id) return

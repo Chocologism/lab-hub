@@ -28,13 +28,13 @@ function handleReset() {
 }
 
 function handleStartTutorial() {
-  openTutorial({ role: currentUser.value?.role || 'student', mandatory: false })
+  openTutorial({ role: currentUser.value?.role || 'admin', mandatory: false })
 }
 
 function handleToggleRole() {
-  const currentIdentity = currentUser.value?.identity || 'student'
-  const nextIdentity = currentIdentity === 'student' ? 'teacher' : 'student'
-  const updated = switchDemoRole(nextIdentity)
+  const currentRole = currentUser.value?.role || 'admin'
+  const nextRole = currentRole === 'admin' ? 'member' : 'admin'
+  const updated = switchDemoRole(nextRole)
   currentUser.value = updated
   window.location.reload()
 }
@@ -73,10 +73,10 @@ function handleToggleRole() {
 
       <div class="panel-body">
         <div class="user-chip">
-          <span class="user-role-badge" :class="currentUser?.identity === 'teacher' ? 'badge-teacher' : 'badge-student'">
-            {{ currentUser?.identity === 'teacher' ? '导师' : '研究生' }}
+          <span class="user-role-badge" :class="currentUser?.role === 'admin' ? 'badge-teacher' : 'badge-student'">
+            {{ currentUser?.role === 'admin' ? '管理员' : '普通成员' }}
           </span>
-          <span class="user-name truncate">{{ currentUser?.name || '体验官 (陈晨)' }}</span>
+          <span class="user-name truncate">{{ currentUser?.name || '李华 (导师 / 管理员)' }}</span>
         </div>
 
         <div class="actions-group">
@@ -94,7 +94,7 @@ function handleToggleRole() {
           <button
             class="action-btn action-switch"
             @click="handleToggleRole"
-            title="切换导师/组员视角体验不同权限"
+            title="切换管理员/普通成员视角体验不同功能与向导"
           >
             <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>

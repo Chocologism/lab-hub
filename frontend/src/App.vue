@@ -21,7 +21,9 @@ import SystemTutorialModal from './components/SystemTutorialModal.vue'
 import DemoModeBanner from './components/DemoModeBanner.vue'
 import { useTutorial } from './composables/useTutorial'
 import { authApi } from './api/client'
+import { isDemoMode } from './mock/isDemo'
 
+const isDemo = computed(() => isDemoMode())
 const { openTutorial } = useTutorial()
 let hasCheckedTutorial = false
 
@@ -71,6 +73,7 @@ function onUpdatePinned(val) {
     <FeedbackHost />
     <SystemTutorialModal />
     <DemoModeBanner />
+    <div v-if="isDemo" class="demo-watermark-overlay" aria-hidden="true"></div>
   </div>
 </template>
 
@@ -89,4 +92,12 @@ function onUpdatePinned(val) {
 }
 .skip-link:focus { top: 12px; }
 .home-workspace { width: 100%; min-width: 0; }
+
+.demo-watermark-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='160' viewBox='0 0 260 160'%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' transform='rotate(-20 130 80)' fill='%2394a3b8' fill-opacity='0.08' font-size='14' font-family='system-ui, -apple-system, sans-serif' font-weight='500'%3E%E8%99%9A%E6%9E%84%E4%BF%A1%E6%81%AF%EF%BC%8C%E4%BB%85%E4%BE%9B%E5%B1%95%E7%A4%BA%3C/text%3E%3C/svg%3E");
+}
 </style>
