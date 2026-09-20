@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# LabHub 服务器运维与后台进程管理脚本
+# LabOrbit 服务器运维与后台进程管理脚本
 # 用法:
 #   ./deploy_server.sh start    # 启动后台服务 (screen 会话)
 #   ./deploy_server.sh stop     # 停止后台服务
@@ -27,11 +27,11 @@ is_running() {
 case "$1" in
     start)
         if is_running; then
-            echo "⚠️  LabHub 服务已经在后台运行中！"
+            echo "⚠️  LabOrbit 服务已经在后台运行中！"
             echo "   可运行 './deploy_server.sh status' 查看详情。"
             exit 0
         fi
-        echo "🚀 正在启动 LabHub 后台服务..."
+        echo "🚀 正在启动 LabOrbit 后台服务..."
         > "$LOG_FILE"
         nohup ./start.sh > "$LOG_FILE" 2>&1 &
         SERVER_PID=$!
@@ -49,7 +49,7 @@ case "$1" in
         ;;
 
     stop)
-        echo "🛑 正在停止 LabHub 后台服务..."
+        echo "🛑 正在停止 LabOrbit 后台服务..."
         if [ -f "$PID_FILE" ]; then
             kill -9 $(cat "$PID_FILE" 2>/dev/null) 2>/dev/null || true
             rm -f "$PID_FILE"
@@ -65,7 +65,7 @@ case "$1" in
         ;;
 
     restart)
-        echo "🔄 正在重启 LabHub 服务..."
+        echo "🔄 正在重启 LabOrbit 服务..."
         "$0" stop
         sleep 2
         "$0" start
@@ -73,7 +73,7 @@ case "$1" in
 
     status)
         echo "=================================================="
-        echo "📊 LabHub 服务运行状态"
+        echo "📊 LabOrbit 服务运行状态"
         echo "=================================================="
         if is_running; then
             PID_STR="$(cat "$PID_FILE" 2>/dev/null || pgrep -f "backend.main:app" | head -n 1)"
@@ -99,7 +99,7 @@ case "$1" in
         ;;
 
     *)
-        echo "LabHub 服务管理工具"
+        echo "LabOrbit 服务管理工具"
         echo "用法: $0 {start|stop|restart|status|logs}"
         exit 1
         ;;

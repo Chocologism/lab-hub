@@ -45,9 +45,9 @@ app.get('/status', async (c) => {
   const initialized = userCount > 0 && (isInitVal === 'true' || userCount > 0);
 
   const labName = await getSetting(c.env.DB, 'lab_name', '科研协作平台');
-  const labShortName = await getSetting(c.env.DB, 'lab_short_name', 'LabHub');
+  const labShortName = await getSetting(c.env.DB, 'lab_short_name', 'LabOrbit');
   const siteSlogan = await getSetting(c.env.DB, 'site_slogan', '课题组科研协作与知识管理平台');
-  const siteTitle = await getSetting(c.env.DB, 'site_title', 'Lab-Hub');
+  const siteTitle = await getSetting(c.env.DB, 'site_title', 'LabOrbit');
   const institution = await getSetting(c.env.DB, 'institution', '');
   const defaultLocation = await getSetting(c.env.DB, 'default_location', '研讨室 / 腾讯会议');
 
@@ -162,9 +162,9 @@ app.get('/settings', authMiddleware, adminOnlyMiddleware, async (c) => {
   await ensureSystemSettingsSchema(c.env.DB);
   return c.json({
     lab_name: await getSetting(c.env.DB, 'lab_name', '科研协作平台'),
-    lab_short_name: await getSetting(c.env.DB, 'lab_short_name', 'LabHub'),
+    lab_short_name: await getSetting(c.env.DB, 'lab_short_name', 'LabOrbit'),
     site_slogan: await getSetting(c.env.DB, 'site_slogan', '课题组科研协作与知识管理平台'),
-    site_title: await getSetting(c.env.DB, 'site_title', 'Lab-Hub'),
+    site_title: await getSetting(c.env.DB, 'site_title', 'LabOrbit'),
     institution: await getSetting(c.env.DB, 'institution', ''),
     default_location: await getSetting(c.env.DB, 'default_location', '研讨室 / 腾讯会议'),
     ai_system_prompt: await getSetting(c.env.DB, 'ai_system_prompt', ''),

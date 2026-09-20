@@ -5,9 +5,9 @@ const siteConfig = reactive({
   initialized: null, // null = 未知/检测中, true = 已初始化, false = 未初始化
   userCount: 0,
   labName: '科研协作平台',
-  labShortName: 'LabHub',
+  labShortName: 'LabOrbit',
   siteSlogan: '课题组科研协作与知识管理平台',
-  siteTitle: 'Lab-Hub',
+  siteTitle: 'LabOrbit',
   institution: '',
   defaultLocation: '研讨室 / 腾讯会议',
   loaded: false,

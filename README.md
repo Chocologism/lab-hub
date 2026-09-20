@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="docs/images/logo.png" alt="LabHub Logo" width="140" style="border-radius: 20px;" />
+  <img src="docs/images/logo.png" alt="LabOrbit Logo" width="140" style="border-radius: 20px;" />
 </p>
 
-<h1 align="center">LabHub</h1>
+<h1 align="center">LabOrbit</h1>
 
 <p align="center">
   <strong>学术课题组科研协作平台 / Academic Research Lab Hub</strong>
@@ -48,7 +48,7 @@
 3. **基础参考资料分散**：经典的参考教材、讲义 PPT 与代码仓库散落在不同网盘或个人电脑中，新人进组时常常需要反复找人索要；
 4. **学术报告通知零散**：院系前沿讲座常以海报图片或邮件分发，手动转录至个人日程容易遗漏。
 
-**LabHub** 最初正是为了解决这些实际需求而开发的一个轻量协作工具，将文献推荐、组会排期、资料归档与日程提醒整合在一个界面中，支持本地私有部署，也支持通过 Cloudflare 免费服务托管。
+**LabOrbit** 最初正是为了解决这些实际需求而开发的一个轻量协作工具，将文献推荐、组会排期、资料归档与日程提醒整合在一个界面中，支持本地私有部署，也支持通过 Cloudflare 免费服务托管。
 
 ---
 
@@ -60,7 +60,7 @@
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                          LabHub 前端 (Frontend)                         │
+│                          LabOrbit 前端 (Frontend)                         │
 │           Vue 3 + Vite + Tailwind CSS + Three.js + KaTeX                │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │
@@ -240,19 +240,19 @@ In academic research groups, researchers and students often encounter small but 
 3. **Fragmented Reference Materials**: Reference textbooks, lecture notes, and tutorial code repositories are scattered across personal computers and drives, making onboarding difficult for new students;
 4. **Scattered Colloquium Notices**: Department seminar announcements sent as email attachments or image posters are easily overlooked without proper calendar integration.
 
-**LabHub** was built to address these practical lab needs by organizing paper sharing, seminar schedules, reference materials, and academic reminders in one simple interface. It can be run on a local workstation or deployed serverless on Cloudflare's free tier.
+**LabOrbit** was built to address these practical lab needs by organizing paper sharing, seminar schedules, reference materials, and academic reminders in one simple interface. It can be run on a local workstation or deployed serverless on Cloudflare's free tier.
 
 ---
 
 ## 2. Modular Design & Architecture
 
-LabHub is structured as a decoupled frontend-backend application with two deployment options:
+LabOrbit is structured as a decoupled frontend-backend application with two deployment options:
 - **Self-Hosted Mode**: Built with Python FastAPI and SQLite, suitable for local workstations or private Linux servers;
 - **Serverless Mode**: Built with Cloudflare Pages Functions, D1 database, and R2 storage, requiring no dedicated server hardware.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                          LabHub Frontend Interface                     │
+│                          LabOrbit Frontend Interface                     │
 │           Vue 3 + Vite + Tailwind CSS + Three.js + KaTeX                │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │
@@ -332,7 +332,7 @@ Once running, visit `http://127.0.0.1:8000` in your web browser.
 
 #### Option B: Docker Deployment (Recommended for Private Servers)
 
-Use Docker Compose to run LabHub as a persistent service with volume storage:
+Use Docker Compose to run LabOrbit as a persistent service with volume storage:
 
 ```bash
 docker compose -f deploy/docker-compose.yml up -d

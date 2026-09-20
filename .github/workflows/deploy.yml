@@ -1,4 +1,4 @@
-name: Deploy LabHub to Cloudflare Pages
+name: Deploy LabOrbit to Cloudflare Pages
 
 on:
   push:

@@ -78,9 +78,9 @@ def get_system_status(db: Session = Depends(get_db)):
         "initialized": is_init,
         "user_count": user_count,
         "lab_name": get_setting_val(db, "lab_name", "科研协作平台"),
-        "lab_short_name": get_setting_val(db, "lab_short_name", "LabHub"),
+        "lab_short_name": get_setting_val(db, "lab_short_name", "LabOrbit"),
         "site_slogan": get_setting_val(db, "site_slogan", "课题组科研协作与知识管理平台"),
-        "site_title": get_setting_val(db, "site_title", "Lab-Hub"),
+        "site_title": get_setting_val(db, "site_title", "LabOrbit"),
         "institution": get_setting_val(db, "institution", ""),
         "default_location": get_setting_val(db, "default_location", "研讨室 / 腾讯会议"),
     }
@@ -175,9 +175,9 @@ def get_system_settings(
     """获取课题组全量系统配置（管理员）"""
     return {
         "lab_name": get_setting_val(db, "lab_name", "科研协作平台"),
-        "lab_short_name": get_setting_val(db, "lab_short_name", "LabHub"),
+        "lab_short_name": get_setting_val(db, "lab_short_name", "LabOrbit"),
         "site_slogan": get_setting_val(db, "site_slogan", "课题组科研协作与知识管理平台"),
-        "site_title": get_setting_val(db, "site_title", "Lab-Hub"),
+        "site_title": get_setting_val(db, "site_title", "LabOrbit"),
         "institution": get_setting_val(db, "institution", ""),
         "default_location": get_setting_val(db, "default_location", "研讨室 / 腾讯会议"),
         "ai_system_prompt": get_setting_val(db, "ai_system_prompt", ""),

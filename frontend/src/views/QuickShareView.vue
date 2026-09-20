@@ -54,7 +54,7 @@ async function submitShare() {
 }
 </script>
 <template>
-  <main class="share-page"><section class="share-card"><div class="share-top"><span>{{ siteConfig.labShortName || 'LabHub' }}</span><p>文献快速分享</p></div><h1>把这篇论文加入讨论</h1><p class="subtitle">粘贴论文链接，核对元数据，再选择公开或定向推荐。</p>
+  <main class="share-page"><section class="share-card"><div class="share-top"><span>{{ siteConfig.labShortName || 'LabOrbit' }}</span><p>文献快速分享</p></div><h1>把这篇论文加入讨论</h1><p class="subtitle">粘贴论文链接，核对元数据，再选择公开或定向推荐。</p>
     <LoadingState v-if="checking" message="正在检查登录状态" />
     <form v-else-if="!isLoggedIn" class="share-form" @submit.prevent="handleQuickLogin"><p class="form-note">登录后继续，已带入的论文链接会保留。</p><label>电子邮箱<input v-model="loginEmail" type="email" required autocomplete="username" /></label><label>密码<input v-model="loginPw" type="password" required autocomplete="current-password" /></label><p v-if="loginError" class="form-error" role="alert">{{ loginError }}</p><button class="button primary" :disabled="loggingIn">{{ loggingIn ? '验证中' : '登录并继续' }}</button></form>
     <div v-else-if="success" class="share-success"><AppIcon name="check" :size="30" /><h2>{{ audience.visibility === 'direct' ? '定向推荐已发送' : '已发布到公共推荐流' }}</h2><p>{{ audience.visibility === 'direct' ? '只有你和所选接收人可见。' : '全组成员现在可以查看这条推荐。' }}</p><router-link to="/arxiv" class="button secondary">返回推荐流</router-link></div>
