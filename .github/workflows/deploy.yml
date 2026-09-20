@@ -34,11 +34,14 @@ jobs:
           npm run build
 
       - name: 部署到 Cloudflare Pages (Deploy via Wrangler)
-        if: secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != ''
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID is not configured in repository secrets. Skipping Cloudflare deployment."
+            exit 0
+          fi
           cd frontend
           npx wrangler pages deploy ./dist --project-name=labhub --branch=main
 
