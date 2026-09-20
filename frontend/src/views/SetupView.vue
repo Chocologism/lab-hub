@@ -21,7 +21,7 @@ const form = reactive({
   admin_password_confirm: '',
   // Step 2: 课题组与全站配置
   lab_name: '',
-  lab_short_name: '',
+  lab_short_name: 'LabOrbit',
   site_slogan: '课题组内部科研协作与知识管理平台',
   site_title: 'LabOrbit',
   invite_code: 'LAB-2026',
@@ -66,7 +66,7 @@ async function handleCompleteSetup() {
     return
   }
   if (!form.lab_short_name.trim()) {
-    errorMessage.value = '请填写课题组英文缩写标识 (如 LAB, AISYS, ASTRO)'
+    errorMessage.value = '请填写课题组英文缩写标识 (如 LabOrbit, AISYS, ASTRO)'
     return
   }
   if (!form.invite_code.trim()) {
@@ -251,7 +251,7 @@ async function handleCompleteSetup() {
               v-model="form.lab_short_name" 
               type="text" 
               class="input-field" 
-              placeholder="如：IPCLAB / AISYS" 
+              placeholder="如：LabOrbit / AISYS" 
               required 
             />
             <span class="field-hint">显示在导航栏 Brand 图标与移动端角标中。</span>

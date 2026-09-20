@@ -34,7 +34,7 @@ const { siteConfig, updateLocalConfig } = useSiteConfig()
 
 const systemConfig = reactive({
   lab_name: '',
-  lab_short_name: '',
+  lab_short_name: 'LabOrbit',
   site_slogan: '',
   institution: '',
   default_location: '',
@@ -49,7 +49,7 @@ async function loadSystemConfig() {
     const res = await systemApi.getSettings()
     if (res) {
       systemConfig.lab_name = res.lab_name || ''
-      systemConfig.lab_short_name = res.lab_short_name || ''
+      systemConfig.lab_short_name = res.lab_short_name || 'LabOrbit'
       systemConfig.site_slogan = res.site_slogan || ''
       systemConfig.institution = res.institution || ''
       systemConfig.default_location = res.default_location || ''
@@ -3121,7 +3121,7 @@ button.danger:hover {
       </label>
       <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
         <span>英文缩写 / 标识 <strong style="color: #ef4444">*</strong></span>
-        <input v-model="systemConfig.lab_short_name" required placeholder="如：IPCLAB / AISYS" />
+        <input v-model="systemConfig.lab_short_name" required placeholder="如：LabOrbit / AISYS" />
       </label>
     </div>
 

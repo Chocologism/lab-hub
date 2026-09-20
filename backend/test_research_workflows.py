@@ -107,16 +107,16 @@ def test_mail_dates_and_missing_fields():
     english, _ = parse_mail(b'Title: Galaxies\nDate: September 8, 2026 2:30 PM')
     assert english['date'] == '2026-09-08' and english['time'] == '14:30'
     forum_mail = (
-        '紫台青促会第181期青年论坛 时间2026年9月18日 上午10:30 地点5-516会议室\n'
+        '青年学者论坛第181期 时间2026年9月18日 上午10:30 地点科研楼 5-516 会议室\n'
         '各位老师、同学：\n'
-        '紫台青年论坛第181期将于2026年9月18日（周五）上午 10：30 在紫台 5-516 会议室举办，'
+        '青年论坛第181期将于2026年9月18日（周五）上午 10：30 在科研楼 5-516 会议室举办，'
         '本次邀请到中国科学院国家天文台的陈云博士，做题为《Probing Dynamical Dark Energy: Evidence & Tensions》的报告。'
     )
     forum_parsed, _ = parse_mail(forum_mail.encode())
     assert forum_parsed['title'] == 'Probing Dynamical Dark Energy: Evidence & Tensions'
     assert forum_parsed['date'] == '2026-09-18' and forum_parsed['time'] == '10:30'
     assert forum_parsed['speaker'] == '陈云 博士'
-    assert forum_parsed['location'] == '紫台 5-516 会议室'
+    assert forum_parsed['location'] == '科研楼 5-516 会议室'
 
 
 def test_eml_inline_poster_upload_and_talk_permissions(headers):

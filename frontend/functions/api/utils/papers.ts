@@ -112,7 +112,7 @@ export async function fetchArxivMetadata(arxivId: string) {
     const absUrl = cleanId.includes('/') ? `https://arxiv.org/abs/${cleanId}` : `https://arxiv.org/abs/${encodeURIComponent(cleanId)}`;
     const res = await fetch(absUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 (LabHub/1.0)',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 (LabOrbit/1.0)',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       }
     });
@@ -123,40 +123,37 @@ export async function fetchArxivMetadata(arxivId: string) {
         return meta;
       }
     }
-  } catch (e) {
-    console.warn('Scraping arxiv abs failed, falling back to API query:', e);
+  } catch (err) {
+    console.warn(`Direct arXiv abs HTML fetch failed for ${cleanId}, falling back to API:`, err);
   }
 
-  // 2. 回退机制：使用 arXiv 官方 export API
-  const url = `https://export.arxiv.org/api/query?id_list=${encodeURIComponent(cleanId)}&max_results=1`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'Lab-Hub/1.0 (academic literature sharing)' } });
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error('arXiv 服务器访问频次受限 (HTTP 429)，请稍候片刻重试');
-    }
-    throw new Error(`arXiv API 返回 HTTP ${res.status}`);
-  }
+  // 2. 回退机制：从 export.arxiv.org API 查询
+  const url = `https://export.arxiv.org/api/query?id_list=${encodeURIComponent(cleanId)}`;
+  const res = await fetch(url, { headers: { 'User-Agent': 'LabOrbit/1.0 (mailto:admin@lab.edu)' } });
+  if (!res.ok) throw new Error(`arXiv API 返回 HTTP ${res.status}`);
   const text = await res.text();
 
-  const titleMatch = text.match(/<entry>[\s\S]*?<title>([\s\S]*?)<\/title>/);
-  const summaryMatch = text.match(/<entry>[\s\S]*?<summary>([\s\S]*?)<\/summary>/);
-  const publishedMatch = text.match(/<entry>[\s\S]*?<published>([\s\S]*?)<\/published>/);
-  const categoryMatch = text.match(/<entry>[\s\S]*?<arxiv:primary_category[\s\S]*?term="([^"]+)"/);
+  const titleMatch = text.match(/<title>([\s\S]*?)<\/title>/g);
+  const title = titleMatch && titleMatch[1] ? decodeHtmlEntities(titleMatch[1].replace(/<\/?title>/g, '').replace(/\s+/g, ' ').trim()) : `arXiv:${arxivId}`;
+
+  const summaryMatch = text.match(/<summary>([\s\S]*?)<\/summary>/);
+  const abstract = summaryMatch ? decodeHtmlEntities(summaryMatch[1].replace(/\s+/g, ' ').trim()) : '';
+
+  const publishedMatch = text.match(/<published>([\s\S]*?)<\/published>/);
+  const publishedDate = publishedMatch ? publishedMatch[1].slice(0, 10) : '';
+
+  const categoryMatch = text.match(/<arxiv:primary_category[\s\S]*?term="([^"]+)"/);
+  const primaryCategory = categoryMatch ? categoryMatch[1].trim() : '';
 
   const authorMatches = Array.from(text.matchAll(/<author>\s*<name>([\s\S]*?)<\/name>/g));
-  const authors = authorMatches.map(m => m[1].trim());
-
-  let title = titleMatch ? titleMatch[1].replace(/\s+/g, ' ').trim() : `arXiv:${arxivId}`;
-  let abstract = summaryMatch ? summaryMatch[1].replace(/\s+/g, ' ').trim() : '';
-  let published = publishedMatch ? publishedMatch[1].slice(0, 10) : '';
-  let primaryCategory = categoryMatch ? categoryMatch[1] : 'astro-ph';
+  const authors = authorMatches.map(m => decodeHtmlEntities(m[1].trim()));
 
   return {
     arxiv_id: arxivId,
     title,
     authors,
     abstract,
-    published_date: published,
+    published_date: publishedDate,
     primary_category: primaryCategory,
     pdf_url: `https://arxiv.org/pdf/${arxivId}.pdf`,
     source_url: `https://arxiv.org/abs/${arxivId}`,
@@ -165,26 +162,104 @@ export async function fetchArxivMetadata(arxivId: string) {
 }
 
 export async function fetchDoiMetadata(doi: string) {
-  const url = `https://api.crossref.org/works/${encodeURIComponent(doi)}`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'Lab-Hub/1.0 (academic literature sharing)' } });
+  const cleanDoi = doi.trim();
+
+  // 1. 优先尝试从 arXiv 官方 API 通过 search_query=doi:"..." 精准查询
+  // 若匹配到对应 arXiv 预印本，则能直接获得标准 arXiv 编号、摘要、主分类及免翻墙的 open-access PDF 链接
+  try {
+    const arxivUrl = `https://export.arxiv.org/api/query?search_query=doi:${encodeURIComponent(cleanDoi)}&max_results=1`;
+    const res = await fetch(arxivUrl, { headers: { 'User-Agent': 'LabOrbit/1.0 (mailto:admin@lab.edu)' } });
+    if (res.ok) {
+      const text = await res.text();
+      const entryMatch = text.match(/<entry>[\s\S]*?<\/entry>/);
+      if (entryMatch) {
+        const entryXml = entryMatch[0];
+        const idMatch = entryXml.match(/<id>[\s\S]*?(?:abs\/|arxiv\.org\/abs\/)?([0-9]{4}\.[0-9]{4,5}|[a-zA-Z.-]+(?:\.[a-zA-Z]+)?\/\d{7})(?:v\d+)?<\/id>/);
+        if (idMatch) {
+          const matchedArxivId = idMatch[1];
+          const titleMatch = entryXml.match(/<title>([\s\S]*?)<\/title>/);
+          const summaryMatch = entryXml.match(/<summary>([\s\S]*?)<\/summary>/);
+          const publishedMatch = entryXml.match(/<published>([\s\S]*?)<\/published>/);
+          const categoryMatch = entryXml.match(/<arxiv:primary_category[\s\S]*?term="([^"]+)"/);
+          const authorMatches = Array.from(entryXml.matchAll(/<author>\s*<name>([\s\S]*?)<\/name>/g));
+          const authors = authorMatches.map(m => decodeHtmlEntities(m[1].trim()));
+
+          const title = titleMatch ? decodeHtmlEntities(titleMatch[1].replace(/\s+/g, ' ').trim()) : '';
+          const abstract = summaryMatch ? decodeHtmlEntities(summaryMatch[1].replace(/\s+/g, ' ').trim()) : '';
+          const published = publishedMatch ? publishedMatch[1].slice(0, 10) : '';
+          const primaryCategory = categoryMatch ? categoryMatch[1].trim() : '';
+
+          if (abstract && title) {
+            let journal = '';
+            try {
+              const crossrefRes = await fetch(`https://api.crossref.org/works/${encodeURIComponent(cleanDoi)}`, {
+                headers: { 'User-Agent': 'LabOrbit/1.0 (mailto:admin@lab.edu)' }
+              });
+              if (crossrefRes.ok) {
+                const crData: any = await crossrefRes.json();
+                const crMsg = crData.message || {};
+                journal = Array.isArray(crMsg['container-title']) ? crMsg['container-title'][0] : (crMsg['container-title'] || '');
+              }
+            } catch (e) {}
+
+            return {
+              arxiv_id: matchedArxivId,
+              title,
+              authors,
+              abstract,
+              published_date: published,
+              primary_category: primaryCategory,
+              pdf_url: `https://arxiv.org/pdf/${matchedArxivId}.pdf`,
+              source_url: `https://doi.org/${cleanDoi}`,
+              journal
+            };
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Querying arXiv by DOI failed, falling back to Crossref / Semantic Scholar:', err);
+  }
+
+  // 2. 回退机制：从 Crossref 抓取基础元数据
+  const url = `https://api.crossref.org/works/${encodeURIComponent(cleanDoi)}`;
+  const res = await fetch(url, { headers: { 'User-Agent': 'LabOrbit/1.0 (mailto:admin@lab.edu)' } });
   if (!res.ok) throw new Error(`Crossref API 返回 HTTP ${res.status}`);
   const data: any = await res.json();
   const msg = data.message || {};
 
-  const title = Array.isArray(msg.title) ? msg.title[0] : (msg.title || doi);
+  const title = Array.isArray(msg.title) ? msg.title[0] : (msg.title || cleanDoi);
   const authors = (msg.author || []).map((a: any) => `${a.given || ''} ${a.family || ''}`.trim()).filter(Boolean);
   const journal = Array.isArray(msg['container-title']) ? msg['container-title'][0] : (msg['container-title'] || '');
   const publishedDate = msg.published?.['date-parts']?.[0]?.join('-') || '';
+  let abstract = (msg.abstract || '').replace(/<[^>]+>/g, '').trim();
+
+  // 3. 若 Crossref 缺失摘要，从 Semantic Scholar 补全
+  if (!abstract) {
+    try {
+      const s2Res = await fetch(`https://api.semanticscholar.org/graph/v1/paper/DOI:${encodeURIComponent(cleanDoi)}?fields=title,abstract,authors,year,journal,openAccessPdf`, {
+        headers: { 'User-Agent': 'LabOrbit/1.0' }
+      });
+      if (s2Res.ok) {
+        const s2Data: any = await s2Res.json();
+        if (s2Data?.abstract) {
+          abstract = s2Data.abstract.trim();
+        }
+      }
+    } catch (e) {
+      console.warn('Semantic Scholar abstract fallback failed:', e);
+    }
+  }
 
   return {
-    arxiv_id: `doi:${doi}`,
-    title,
+    arxiv_id: `doi:${cleanDoi}`,
+    title: decodeHtmlEntities(title),
     authors,
-    abstract: (msg.abstract || '').replace(/<[^>]+>/g, '').trim(),
+    abstract: decodeHtmlEntities(abstract),
     published_date: publishedDate,
     primary_category: '',
     pdf_url: msg.link?.[0]?.URL || '',
-    source_url: `https://doi.org/${doi}`,
+    source_url: `https://doi.org/${cleanDoi}`,
     journal
   };
 }

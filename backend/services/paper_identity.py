@@ -36,7 +36,19 @@ def match_feed(content, doi, metadata):
 
 
 async def find_arxiv(doi, metadata):
-    # The documented API supports title searches; DOI is verified from each Atom entry.
+    # 1. 优先通过 DOI 精准匹配 arXiv 预印本
+    if doi:
+        try:
+            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=8), trust_env=True) as session:
+                async with session.get('https://export.arxiv.org/api/query', params={'search_query': f'doi:{doi}', 'max_results': 1}) as response:
+                    if response.status == 200:
+                        feed_match = match_feed(await response.text(), doi, metadata)
+                        if feed_match:
+                            return feed_match
+        except (aiohttp.ClientError, TimeoutError, ET.ParseError):
+            pass
+
+    # 2. 标题模糊匹配回退
     words = re.findall(r'\w+', metadata['title'], re.UNICODE)
     if not words:
         return None

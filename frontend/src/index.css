@@ -80,7 +80,10 @@ body,#app { min-height:100%; margin:0; }
 .button.secondary:hover:not(:disabled) { background:rgba(184,155,248,.22); border-color:rgba(184,155,248,.4); }
 .button.ghost,.button-quiet { background:transparent; color:var(--soft); }
 .button.ghost:hover,.button-quiet:hover { background:var(--raised); color:var(--text); }
-.button.danger { background:var(--danger-bg); color:var(--danger); border-color:rgba(255,194,196,.25); }
+.button.danger { background:var(--danger-bg); color:var(--danger); border-color:var(--danger-border); font-weight:500; }
+.button.danger:hover:not(:disabled) { background:rgba(239,68,68,.22); border-color:rgba(239,68,68,.55); color:#fca5a5; }
+.button.ghost.danger { background:transparent; border-color:transparent; color:var(--danger); }
+.button.ghost.danger:hover:not(:disabled) { background:var(--danger-bg); border-color:var(--danger-border); color:#fca5a5; }
 .button.small { min-height:36px; padding:7px 12px; font-size:13px; }
 .icon-button { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:40px; height:40px; border:1px solid transparent; border-radius:12px; background:transparent; color:var(--soft); -webkit-tap-highlight-color:transparent; }
 @media (hover: hover) and (pointer: fine) {
@@ -97,7 +100,7 @@ body,#app { min-height:100%; margin:0; }
 .segmented button.active { background:var(--raised); color:var(--text); }
 .empty-state { padding:60px 24px; text-align:center; color:var(--muted); border:1px dashed var(--line); border-radius:var(--radius); background:var(--surface); }
 .empty-state h3 { font-size:20px; margin:12px 0 8px; } .empty-state .button { margin-top:18px; }
-.error-banner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; padding:14px 18px; background:var(--danger-bg); border:1px solid rgba(255,194,196,.25); color:var(--danger); border-radius:12px; font-size:14px; }
+.error-banner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; padding:14px 18px; background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger); border-radius:12px; font-size:14px; }
 .form-grid { display:grid; gap:16px; } .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .form-actions { display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:24px; }
 dialog:not([open]),
@@ -208,7 +211,7 @@ dialog:not([open]),
 
 /* Shared business surfaces: retain existing controls and readable dense content. */
 .app-shell .workspace .page-shell,.app-shell .workspace .resource-shell { padding:0; max-width:none; }
-.app-shell .paper-row,.app-shell .recommend-panel,.app-shell .library-paper,.app-shell .book-card,.app-shell .timeline-slot,.app-shell .week-view { border-radius:var(--radius); box-shadow:var(--shadow); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); transform:translateZ(0); backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.app-shell .paper-row,.app-shell .recommend-panel,.app-shell .library-paper,.app-shell .book-card,.app-shell .timeline-slot,.app-shell .week-view { border-radius:var(--radius); box-shadow:var(--shadow); }
 .app-shell .paper-list { gap:16px; } .app-shell .paper-row { padding:26px; }
 .app-shell .paper-main h2,.app-shell .preview-card h3 { font-family:var(--font); font-size:21px; line-height:1.5; font-weight:500; }
 .app-shell .paper-main .abstract,.app-shell .recommendation,.app-shell .library-paper .abstract { font-size:15px; line-height:1.8; }
@@ -743,8 +746,9 @@ dialog:not([open]),
   /* 严格保护的独立功能语义色：不受配色方案影响 */
   --warning: #f3d8a2;
   --warning-bg: rgba(181, 140, 76, .17);
-  --danger: #ffc2c4;
-  --danger-bg: #4b2932;
+  --danger: #f87171;
+  --danger-bg: rgba(239, 68, 68, .12);
+  --danger-border: rgba(239, 68, 68, .30);
   --success: #afe2c4;
   --focus: #d0ece2;
   --shadow: 0 12px 40px rgba(1, 15, 21, .14);

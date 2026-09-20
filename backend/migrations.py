@@ -102,5 +102,25 @@ def migrate(engine):
         """))
         connection.execute(text("CREATE INDEX IF NOT EXISTS idx_paper_comments_paper ON paper_comments(paper_id)"))
         connection.execute(text("CREATE INDEX IF NOT EXISTS idx_paper_comments_user ON paper_comments(user_id)"))
+        connection.execute(text("""
+            CREATE TABLE IF NOT EXISTS pending_schedule_imports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                raw_text TEXT NOT NULL,
+                inferred_type VARCHAR(20) NOT NULL DEFAULT 'talk',
+                parsed_data TEXT DEFAULT '{}',
+                image_urls TEXT DEFAULT '[]',
+                file_attachments TEXT DEFAULT '[]',
+                status VARCHAR(20) DEFAULT 'pending',
+                created_by_id INTEGER REFERENCES users(id),
+                created_by_name VARCHAR(100) DEFAULT '',
+                resolved_by_id INTEGER REFERENCES users(id),
+                resolved_by_name VARCHAR(100) DEFAULT '',
+                target_type VARCHAR(20) DEFAULT '',
+                target_id INTEGER,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                resolved_at DATETIME
+            )
+        """))
+        connection.execute(text("CREATE INDEX IF NOT EXISTS idx_pending_imports_status ON pending_schedule_imports(status)"))
 
 

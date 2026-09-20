@@ -1,4 +1,4 @@
--- Cloudflare D1 Database Schema for Lab-Hub
+-- Cloudflare D1 Database Schema for LabOrbit
 -- Fully compatible with SQLite & Cloudflare D1
 
 CREATE TABLE IF NOT EXISTS users (
@@ -9,29 +9,14 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100) UNIQUE NOT NULL,
     hashed_password VARCHAR(200) NOT NULL,
     role VARCHAR(20) DEFAULT 'student',
-    identity VARCHAR(20) NOT NULL DEFAULT 'student',
     avatar VARCHAR(255),
     bio VARCHAR(255),
     token_version INTEGER NOT NULL DEFAULT 0,
     can_manage_seminars INTEGER NOT NULL DEFAULT 0,
     tutorial_completed INTEGER NOT NULL DEFAULT 0,
-    last_active_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_last_active ON users(last_active_at);
-
-CREATE TABLE IF NOT EXISTS invite_codes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    code TEXT NOT NULL UNIQUE,
-    note TEXT NOT NULL DEFAULT '',
-    registration_role TEXT NOT NULL DEFAULT 'student' CHECK (registration_role IN ('student', 'admin')),
-    registration_identity TEXT NOT NULL DEFAULT 'student' CHECK (registration_identity IN ('student', 'teacher')),
-    is_active INTEGER NOT NULL DEFAULT 1,
-    created_by_id INTEGER REFERENCES users(id),
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE INDEX IF NOT EXISTS idx_invite_codes_active ON invite_codes(is_active);
 
 CREATE TABLE IF NOT EXISTS resource_categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,11 +61,9 @@ CREATE TABLE IF NOT EXISTS arxiv_papers (
     recommended_by_id INTEGER NOT NULL REFERENCES users(id),
     recommend_comment TEXT,
     is_pinned BOOLEAN DEFAULT 0,
-    seminar_id INTEGER REFERENCES seminar_schedules(id),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_arxiv_papers_arxiv_id ON arxiv_papers(arxiv_id);
-CREATE INDEX IF NOT EXISTS idx_arxiv_papers_seminar_id ON arxiv_papers(seminar_id);
 
 CREATE TABLE IF NOT EXISTS paper_read_marks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -89,16 +72,6 @@ CREATE TABLE IF NOT EXISTS paper_read_marks (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_read_marks_paper_user ON paper_read_marks(paper_id, user_id);
-
-CREATE TABLE IF NOT EXISTS paper_comments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    paper_id INTEGER NOT NULL REFERENCES arxiv_papers(id) ON DELETE CASCADE,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    content TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-CREATE INDEX IF NOT EXISTS idx_paper_comments_paper ON paper_comments(paper_id);
-CREATE INDEX IF NOT EXISTS idx_paper_comments_user ON paper_comments(user_id);
 
 CREATE TABLE IF NOT EXISTS seminar_schedules (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -142,7 +115,6 @@ CREATE TABLE IF NOT EXISTS library_papers (
     metadata_status VARCHAR(20) DEFAULT 'ready',
     from_recommendation BOOLEAN DEFAULT 0,
     from_seminar BOOLEAN DEFAULT 0,
-    seminar_id INTEGER REFERENCES seminar_schedules(id),
     identity_checked_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -164,14 +136,12 @@ CREATE TABLE IF NOT EXISTS uploaded_files (
 CREATE TABLE IF NOT EXISTS observatory_talks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     date VARCHAR(10) NOT NULL,
-    end_date VARCHAR(10) DEFAULT '',
-    time VARCHAR(30) NOT NULL DEFAULT '14:30',
+    time VARCHAR(5) NOT NULL,
     title TEXT NOT NULL,
     speaker TEXT DEFAULT '',
     location TEXT DEFAULT '',
     poster_url TEXT DEFAULT '',
     notes TEXT DEFAULT '',
-    event_type VARCHAR(20) DEFAULT 'talk',
     created_by_id INTEGER NOT NULL REFERENCES users(id),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -207,16 +177,6 @@ CREATE TABLE IF NOT EXISTS favorites (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, kind, target)
 );
-
-CREATE TABLE IF NOT EXISTS schedule_interests (
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    item_type VARCHAR(20) NOT NULL, -- 'seminar' | 'talk'
-    item_id INTEGER NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, item_type, item_id)
-);
-CREATE INDEX IF NOT EXISTS idx_schedule_interests_item ON schedule_interests(item_type, item_id);
-CREATE INDEX IF NOT EXISTS idx_schedule_interests_user ON schedule_interests(user_id);
 
 CREATE TABLE IF NOT EXISTS issue_feedback (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -263,58 +223,26 @@ CREATE TABLE IF NOT EXISTS user_cached_emails (
     body_text TEXT DEFAULT '',
     body_html TEXT DEFAULT '',
     has_attachments BOOLEAN DEFAULT 0,
-    poster_url TEXT DEFAULT '',
     is_read BOOLEAN DEFAULT 0,
     fetched_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_cached_emails_user_uid ON user_cached_emails(user_id, msg_uid);
 
-CREATE TABLE IF NOT EXISTS system_smtp_configs (
+CREATE TABLE IF NOT EXISTS pending_schedule_imports (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-    host VARCHAR(150) NOT NULL,
-    port INTEGER NOT NULL DEFAULT 465,
-    use_ssl BOOLEAN NOT NULL DEFAULT 1,
-    username VARCHAR(150) NOT NULL,
-    encrypted_password TEXT NOT NULL,
-    from_email VARCHAR(150) NOT NULL,
-    from_name VARCHAR(100) DEFAULT '',
-    use_imap_password BOOLEAN DEFAULT 0,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS sent_emails (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    subject TEXT NOT NULL,
-    sender_name VARCHAR(150) NOT NULL,
-    sender_email VARCHAR(150) NOT NULL,
-    recipients TEXT NOT NULL,
-    body_text TEXT NOT NULL,
-    body_html TEXT DEFAULT '',
-    status VARCHAR(20) DEFAULT 'sent',
-    error_message TEXT DEFAULT '',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-CREATE INDEX IF NOT EXISTS idx_sent_emails_user ON sent_emails(user_id);
-CREATE INDEX IF NOT EXISTS idx_sent_emails_created ON sent_emails(created_at);
-
-CREATE TABLE IF NOT EXISTS notices (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    category VARCHAR(50) DEFAULT 'general',
-    importance VARCHAR(20) DEFAULT 'normal',
-    start_date VARCHAR(30) DEFAULT '',
-    end_date VARCHAR(30) DEFAULT '',
-    source_email_uid VARCHAR(150) DEFAULT '',
-    source_email_subject TEXT DEFAULT '',
-    source_email_sender TEXT DEFAULT '',
-    created_by_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    raw_text TEXT NOT NULL DEFAULT '',
+    inferred_type VARCHAR(50) NOT NULL DEFAULT 'talk',
+    parsed_data TEXT NOT NULL DEFAULT '{}',
+    image_urls TEXT NOT NULL DEFAULT '[]',
+    file_attachments TEXT NOT NULL DEFAULT '[]',
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    created_by_id INTEGER REFERENCES users(id),
     created_by_name VARCHAR(100) DEFAULT '',
+    resolved_by_id INTEGER REFERENCES users(id),
+    resolved_by_name VARCHAR(100) DEFAULT '',
+    target_type VARCHAR(50) DEFAULT '',
+    target_id INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    resolved_at DATETIME
 );
-CREATE INDEX IF NOT EXISTS idx_notices_source_uid ON notices(source_email_uid);
-CREATE INDEX IF NOT EXISTS idx_notices_end_date ON notices(end_date);
-
+CREATE INDEX IF NOT EXISTS idx_pending_schedule_imports_status ON pending_schedule_imports(status);

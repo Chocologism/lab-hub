@@ -346,3 +346,22 @@ class Notice(Base):
     creator = relationship("User")
 
 
+class PendingScheduleImport(Base):
+    __tablename__ = "pending_schedule_imports"
+    id = Column(Integer, primary_key=True)
+    raw_text = Column(Text, nullable=False, default="")
+    inferred_type = Column(String(20), nullable=False, default="talk")
+    parsed_data = Column(Text, default="{}")
+    image_urls = Column(Text, default="[]")
+    file_attachments = Column(Text, default="[]")
+    status = Column(String(20), default="pending", index=True)
+    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    created_by_name = Column(String(100), default="")
+    resolved_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    resolved_by_name = Column(String(100), default="")
+    target_type = Column(String(20), default="")
+    target_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    resolved_at = Column(DateTime, nullable=True)
+
+

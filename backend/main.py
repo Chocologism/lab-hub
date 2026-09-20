@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .database import engine, Base
-from .routers import auth, arxiv, seminar, resources, library, talks, files, personal, account, mailbox, notices, system
+from .routers import auth, arxiv, seminar, resources, library, talks, files, personal, account, mailbox, notices, system, schedule_imports
 from .seed import init_db
 
 from fastapi.middleware.gzip import GZipMiddleware
@@ -14,7 +14,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 # 创建 FastAPI 实例
 app = FastAPI(
-    title="Lab-Hub API",
+    title="LabOrbit API",
     description="专为学术课题组设计的内部文献交流、组会排期与资料整合系统",
     version="1.0.0"
 )
@@ -57,6 +57,7 @@ app.include_router(account.router)
 app.include_router(mailbox.router)
 app.include_router(notices.router)
 app.include_router(system.router)
+app.include_router(schedule_imports.router)
 
 
 
@@ -70,7 +71,7 @@ def on_startup():
 def health_check():
     return {
         "status": "healthy",
-        "service": "LabHub API",
+        "service": "LabOrbit API",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 

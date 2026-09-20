@@ -71,10 +71,18 @@ async def fetch_journal_metadata(value):
         matched = await find_arxiv(doi, result)
     except (aiohttp.ClientError, TimeoutError, ValueError):
         matched = None
-    # Never substitute a publisher abstract for an unavailable arXiv abstract.
-    result['abstract'] = ''
     if matched:
         result.update(matched)
         result['source_url'] = 'https://doi.org/' + doi
         result['journal'] = clean((data.get('container-title') or [''])[0]) or result.get('journal', '')
+    elif not result.get('abstract'):
+        try:
+            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=8)) as session:
+                async with session.get(f'https://api.semanticscholar.org/graph/v1/paper/DOI:{quote(doi, safe="")}', params={'fields': 'abstract'}) as s2_res:
+                    if s2_res.status == 200:
+                        s2_data = await s2_res.json()
+                        if s2_data and s2_data.get('abstract'):
+                            result['abstract'] = clean(s2_data['abstract'])
+        except Exception:
+            pass
     return result

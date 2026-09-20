@@ -264,25 +264,33 @@ export const PRESET_PROVIDERS = [
 export function normalizeModelItem(item) {
   if (typeof item === 'string') {
     const isReasoning = item.includes('reason') || item.includes('flash') || item.includes('r1') || item.includes('o1')
-    const isVision = /deepseek.*(?:flash|v4|vl)|gpt-4o|gpt-4-turbo|gpt-4-vision|vision|vl\b|qwen.*vl|glm-4v|internvl|minicpm-v|llava|claude-3|gemini|pixtral|qvq/i.test(item)
+    const isVision = /(?:deepseek.*(?:-vl|_vl|\bvl\b|flash|v4)|gpt-4o|gpt-4-turbo|gpt-4-vision|vision|\bvl\b|qwen.*vl|glm-4v|internvl|minicpm-v|llava|claude-3|gemini|pixtral|qvq)/i.test(item)
+    const isDeepSeekOfficialText = /^(?:deepseek-chat|deepseek-reasoner)$/i.test(item)
     return {
       id: item,
       name: item,
       contextWindow: 1000000,
       supportsReasoningEffort: isReasoning,
-      supportsVision: isVision,
+      supportsVision: isDeepSeekOfficialText ? false : isVision,
       reasoningEffort: 'off'
     }
   }
   const modelId = item.id || ''
   const modelName = item.name || modelId || ''
-  const autoVision = /deepseek.*(?:flash|v4|vl)|gpt-4o|gpt-4-turbo|gpt-4-vision|vision|vl\b|qwen.*vl|glm-4v|internvl|minicpm-v|llava|claude-3|gemini|pixtral|qvq/i.test(`${modelId} ${modelName}`)
+  const autoVision = /(?:deepseek.*(?:-vl|_vl|\bvl\b|flash|v4)|gpt-4o|gpt-4-turbo|gpt-4-vision|vision|\bvl\b|qwen.*vl|glm-4v|internvl|minicpm-v|llava|claude-3|gemini|pixtral|qvq)/i.test(`${modelId} ${modelName}`)
+  const isDeepSeekOfficialText = /^(?:deepseek-chat|deepseek-reasoner)$/i.test(modelId)
+  const isVLabDeepSeek = /(?:deepseek.*(?:-vl|_vl|\bvl\b|flash|v4))/i.test(modelId)
+  const supportsVision = isDeepSeekOfficialText
+    ? false
+    : isVLabDeepSeek
+      ? true
+      : (item.supportsVision !== undefined ? Boolean(item.supportsVision) : autoVision)
   return {
     id: modelId,
     name: modelName,
     contextWindow: Number(item.contextWindow) || 1000000,
     supportsReasoningEffort: Boolean(item.supportsReasoningEffort),
-    supportsVision: item.supportsVision !== undefined ? Boolean(item.supportsVision) : autoVision,
+    supportsVision,
     reasoningEffort: item.reasoningEffort || 'off'
   }
 }
@@ -944,10 +952,20 @@ export function extractJsonFromText(text) {
  */
 export function isModelVisionCapable(config) {
   const aiConfig = config || loadAiConfig()
-  if (!aiConfig) return false
-  const modelId = (aiConfig.model || '').toLowerCase()
+  if (!aiConfig || !aiConfig.model) return false
+  const modelId = String(aiConfig.model).toLowerCase()
 
-  // 1. 模型列表中的显式配置
+  // 1. DeepSeek 官方 api.deepseek.com 上的 deepseek-chat 和 deepseek-reasoner 确为纯文本
+  if (aiConfig.provider === 'deepseek' || /^(?:deepseek-chat|deepseek-reasoner)$/i.test(modelId)) {
+    return false
+  }
+
+  // 2. USTC VLab 平台或 DeepSeek Flash / V4 / VL 系列支持视觉图片输入
+  if (aiConfig.provider === 'ustc_vlab' || /(?:deepseek.*(?:-vl|_vl|\bvl\b|flash|v4))/i.test(modelId)) {
+    return true
+  }
+
+  // 3. 模型列表中的显式配置
   if (Array.isArray(aiConfig.models)) {
     const found = aiConfig.models.find(m => m.id === aiConfig.model)
     if (found && typeof found.supportsVision === 'boolean') {
@@ -955,7 +973,7 @@ export function isModelVisionCapable(config) {
     }
   }
 
-  // 2. 预设模型库中的匹配
+  // 4. 预设模型库中的匹配
   for (const p of PRESET_PROVIDERS) {
     const found = (p.models || []).find(m => m.id === aiConfig.model)
     if (found && typeof found.supportsVision === 'boolean') {
@@ -963,8 +981,8 @@ export function isModelVisionCapable(config) {
     }
   }
 
-  // 3. 通用多模态模型名模式识别 (DeepSeek V4.1 Flash, GPT-4o, Claude 3.5 Sonnet, Gemini 1.5/2.0, Qwen-VL, GLM-4V 等)
-  if (/deepseek.*(?:flash|v4|vl)|gpt-4o|gpt-4-turbo|gpt-4-vision|vision|vl\b|qwen.*vl|glm-4v|internvl|minicpm-v|llava|claude-3|gemini|pixtral|qvq/i.test(modelId)) {
+  // 5. 通用多模态模型名模式识别 (GPT-4o, Claude 3.5 Sonnet, Gemini, Qwen-VL, GLM-4V 等)
+  if (/(?:gpt-4o|gpt-4-turbo|gpt-4-vision|vision|\bvl\b|qwen.*vl|glm-4v|internvl|minicpm-v|llava|claude-3|gemini|pixtral|qvq)/i.test(modelId)) {
     return true
   }
 
@@ -1007,14 +1025,14 @@ export function isEmailContentBrief(email) {
 }
 
 /**
- * 将图片 URL 转换为 Base64 Data URL (用于多模态视觉请求)
+ * 将图片 URL 转换为 Base64 Data URL (用于多模态视觉请求，客户端自动 Canvas 缩放与高质量压缩)
  */
-export async function convertImageUrlToDataUrl(url, signal) {
+export async function convertImageUrlToDataUrl(url, signal, { maxWidth = 1600, maxHeight = 1600, quality = 0.82 } = {}) {
   if (!url || typeof url !== 'string') return null
   if (url.startsWith('data:')) return url
   try {
     const token = (typeof localStorage !== 'undefined')
-      ? localStorage.getItem('labhub_token')
+      ? (localStorage.getItem('labhub_token') || localStorage.getItem('laborbit_token') || '')
       : ''
     const headers = {}
     if (token && (url.startsWith('/') || url.includes('/api/files/'))) {
@@ -1026,6 +1044,42 @@ export async function convertImageUrlToDataUrl(url, signal) {
       return null
     }
     const blob = await res.blob()
+
+    // 浏览器环境下优先通过 Canvas 压缩为标准尺寸并转为 DataURL
+    if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof Image !== 'undefined') {
+      try {
+        const compressed = await new Promise((resolve) => {
+          const img = new Image()
+          const objectUrl = URL.createObjectURL(blob)
+          img.onload = () => {
+            URL.revokeObjectURL(objectUrl)
+            let { width, height } = img
+            if (width > maxWidth || height > maxHeight) {
+              const ratio = Math.min(maxWidth / width, maxHeight / height)
+              width = Math.max(1, Math.round(width * ratio))
+              height = Math.max(1, Math.round(height * ratio))
+            }
+            const canvas = document.createElement('canvas')
+            canvas.width = width
+            canvas.height = height
+            const ctx = canvas.getContext('2d')
+            if (!ctx) {
+              resolve(null)
+              return
+            }
+            ctx.drawImage(img, 0, 0, width, height)
+            resolve(canvas.toDataURL('image/jpeg', quality))
+          }
+          img.onerror = () => {
+            URL.revokeObjectURL(objectUrl)
+            resolve(null)
+          }
+          img.src = objectUrl
+        })
+        if (compressed) return compressed
+      } catch (_) {}
+    }
+
     const mimeType = blob.type || 'image/jpeg'
     if (typeof FileReader !== 'undefined') {
       return await new Promise((resolve, reject) => {
@@ -1040,9 +1094,22 @@ export async function convertImageUrlToDataUrl(url, signal) {
       return `data:${mimeType};base64,${base64}`
     }
   } catch (err) {
-    console.warn('读取海报图片 Base64 失败:', err)
+    console.warn('转换为 Base64 失败:', err)
     return null
   }
+}
+
+/**
+ * 清洗 AI 模型提取的字段文本，滤除指令 Prompt 模板、占位符及无实质内容的提示
+ */
+export function cleanAiExtractedText(val, fallback = '') {
+  if (!val || typeof val !== 'string') return fallback
+  const clean = val.trim()
+  if (!clean) return fallback
+  if (/^[【\[]?(?:随附海报图片|随附海报|随附图片|海报图片|仅随附海报)[】\]]?$/i.test(clean)) return fallback
+  if (/请根据随附.*(?:海报|图片|文件)|详细识别并提取/i.test(clean)) return fallback
+  if (/未提供海报图片内容|未提供文字描述.*无法提取|正文未提供文字描述|详见随附学术(?:会议|报告)海报/i.test(clean)) return fallback
+  return clean
 }
 
 /**
@@ -1193,23 +1260,30 @@ export async function extractScheduleFromEmailWithAi(email, { config, signal, po
   const aiConfig = config || loadAiConfig()
   const rawBody = (email.body_text || email.snippet || '').trim()
   const truncatedBody = rawBody.length > 2500 ? rawBody.slice(0, 2500) : rawBody
+  const isPromptOnly = /请根据随附.*(?:海报|图片|文件).*提取/i.test(rawBody) ||
+    /^[【\[]?(?:随附海报图片|随附海报|随附图片|海报图片|仅随附海报)[】\]]?$/i.test(rawBody)
+  const hasSubstantiveText = rawBody.length > 20 && !isPromptOnly
+
+  const isVision = isModelVisionCapable(aiConfig)
+  const imageCandidate = posterImageUrl || email.poster_url || (Array.isArray(email.attachments) && email.attachments[0]?.url) || ''
+
+  if (!isVision && !hasSubstantiveText && Boolean(imageCandidate)) {
+    throw new Error(`您当前配置的模型（${aiConfig.model || '纯文本模型'}）不支持图像视觉识别。对于仅提供海报的学术日程条目，请在「AI 科研助手」->「模型配置」中切换为支持视觉的多模态模型（如 通义千问 Qwen2.5-VL / GPT-4o 等），或先输入/勾选文本内容。`)
+  }
 
   const mailContent = `邮件主题: ${email.subject || ''}
 发件人: ${email.from || ''}
 邮件时间: ${email.date || ''}
 邮件正文:
-${truncatedBody}`
+${hasSubstantiveText ? truncatedBody : '（正文未提供文字描述，详见随附学术报告海报）'}`
 
   const isBrief = isEmailContentBrief(email)
-  const isVision = isModelVisionCapable(aiConfig)
-  const imageCandidate = posterImageUrl || email.poster_url || (Array.isArray(email.attachments) && email.attachments[0]?.url) || ''
-
   let usedVision = false
   let userContent = mailContent
   let maxTokensToUse = 600
 
   // 只要大模型具备多模态视觉能力且存在海报图片，并且正文简略或正文未提供详尽长篇预印本文本，激活多模态海报深度 OCR 与摘要提取
-  const shouldTryVision = isVision && (isBrief || !email.body_text || email.body_text.length < 800) && Boolean(imageCandidate)
+  const shouldTryVision = isVision && (isBrief || !hasSubstantiveText || email.body_text?.length < 800) && Boolean(imageCandidate)
 
   if (shouldTryVision) {
     try {
@@ -1218,12 +1292,16 @@ ${truncatedBody}`
         userContent = [
           {
             type: 'text',
-            text: `${mailContent}\n\n【多模态海报内容提取核心指令】：
-该学术邮件已随附讲座/报告的海报图片。
+            text: `${hasSubstantiveText ? mailContent : '【提示：本场学术报告的关键信息主要记录在随附的海报图片中】'}\n\n【多模态海报内容提取核心指令】：
+该学术日程已随附报告海报图片。
 请你仔细阅读并 OCR 识别海报图片中的所有文字，重点提取：
-1. 报告摘要 / 研究内容简介 (Abstract / Overview)；
-2. 报告人简介 / 背景介绍 (Speaker Bio)；
-3. 任何邮件正文中遗漏的报告核心信息。
+1. 报告题目 (title)；
+2. 报告日期 (date, YYYY-MM-DD) 与开始时间 (time, HH:mm)；
+3. 报告人姓名与职称单位 (speaker)；
+4. 地点或会议号 (location)；
+5. 报告摘要 / 研究内容简介 (Abstract / Overview)；
+6. 报告人简介 / 背景介绍 (Speaker Bio)；
+7. 任何邮件正文中遗漏的报告核心信息。
 请将海报中记载的报告摘要、研究内容简介与主讲人背景充实、客观、忠实地填充到 notes（说明）字段中，务求完整呈现学术报告的核心内容！`
           },
           {
@@ -1235,22 +1313,25 @@ ${truncatedBody}`
         maxTokensToUse = 1800
       }
     } catch (e) {
-      console.warn('获取海报图片进行视觉识别失败，降级为文本提取:', e)
+      console.warn('获取海报图片进行视觉识别失败:', e)
+      if (!hasSubstantiveText) {
+        throw new Error(`获取学术报告海报图片失败（${e.message || '图片读取错误'}）。请检查图片有效性或网络。`)
+      }
     }
   }
 
-  const systemPrompt = `你是一个科研学术邮件日程结构化提取助手。请从给定的学术讲座/报告通知邮件${usedVision ? '以及随附的海报图片' : ''}中精准提取日程字段。
+  const systemPrompt = `你是一个科研学术日程结构化提取助手。请从给定的学术讲座/报告通知${usedVision ? '以及随附的海报图片' : ''}中精准提取日程字段。
 
 提取硬性规范：
-1. 忠实原邮件与海报：不要进行主观总结或润色，提取客观日程信息；
-2. 中文优先原则：若邮件或海报中同时出现标题的中英文、报告人的中英文或地点的中英文，必须优先填入中文；仅当原文只有英文时才填入英文；
-3. 地点规范：提取真实的会议室、报告厅或会议号。严禁将正文称谓（如“各位老师、同学：”）误作为地点；
+1. 忠实原信息与海报：不要进行主观总结或润色，提取客观日程信息；
+2. 中文优先原则：若原文或海报中同时出现标题的中英文、报告人的中英文或地点的中英文，必须优先填入中文；仅当原文只有英文时才填入英文；
+3. 地点规范：提取真实的会议室、报告厅或会议号。严禁将正文称谓误作为地点；
 4. 标题(title)：纯正报告题目。必须自动剥离“Fw:”、“转发:”、“【学术报告】”、“讲座通知:”等前缀；若同时有中英文标题，优先提取中文标题；
 5. 日期(date)：公历日期，严格格式 "YYYY-MM-DD"；
 6. 时间(time)：24小时制，严格格式 "HH:mm"；
 7. 报告人(speaker)：主讲人姓名与职称单位，优先中文；若仅有英文则保留英文；切勿将称谓误当作报告人；
 8. 地点(location)：真实会议室或会议号，优先中文；
-9. 说明(notes)：邮件关于报告的摘要全文或背景要点。${usedVision ? '【特别强调】：当前已随附海报图片，请务必仔细阅读并 OCR 识别海报上的文字，将海报中记载的报告摘要、研究内容简介与主讲人背景忠实完整地填入 notes 中，严禁只输出空或简略的一两句话！' : '忠实原邮件，无需总结'}；
+9. 说明(notes)：报告摘要全文或背景要点。${usedVision ? '【特别强调】：当前已随附海报图片，请务必仔细阅读并 OCR 识别海报上的文字，将海报中记载的报告摘要、研究内容简介与主讲人背景忠实完整地填入 notes 中，严禁只输出空或简略的一两句话！' : '忠实原内容，无需主观发挥'}；
 10. 必须输出严格 JSON 格式：
 {
   "title": "报告标题",
@@ -1258,8 +1339,8 @@ ${truncatedBody}`
   "time": "HH:mm",
   "speaker": "报告人",
   "location": "地点或会议号",
-  "notes": "说明/邮件正文摘要"
-}`
+  "notes": "说明/正文摘要"
+}幻觉防范：不要把指令提示字符串或空占位符输出到 title 或 notes 中。`
 
   let content = ''
   try {
@@ -1275,7 +1356,7 @@ ${truncatedBody}`
       signal
     })
   } catch (err) {
-    if (usedVision) {
+    if (usedVision && hasSubstantiveText) {
       console.warn('多模态视觉请求失败，自动降级为纯文本提取:', err)
       usedVision = false
       content = await callAiCompletion({
@@ -1290,6 +1371,9 @@ ${truncatedBody}`
         signal
       })
     } else {
+      if (usedVision && !hasSubstantiveText) {
+        throw new Error(`海报多模态视觉识别失败（${err.message || '模型调用异常'}）。当前大模型可能不支持图片输入或网络超时。请切换为支持视觉的多模态模型（如 Qwen2.5-VL / GPT-4o 等），或在左侧输入具体文字描述。`)
+      }
       throw err
     }
   }
@@ -1320,21 +1404,24 @@ ${truncatedBody}`
   }
 
   // 中文优先二次保障（若模型输出了中英双语，优先选取中文部分）
-  const cleanTitle = pickChinesePartIfDual(extracted.title || '')
-  const cleanSpeaker = pickChinesePartIfDual(extracted.speaker || '')
-  let cleanLocation = pickChinesePartIfDual(extracted.location || '')
+  const cleanTitle = cleanAiExtractedText(pickChinesePartIfDual(extracted.title || ''))
+  const cleanSpeaker = cleanAiExtractedText(pickChinesePartIfDual(extracted.speaker || ''))
+  let cleanLocation = cleanAiExtractedText(pickChinesePartIfDual(extracted.location || ''))
 
   // 执行地点规范化保障
   const fullContext = `${email.subject || ''} ${email.from || ''} ${rawBody}`
   cleanLocation = applyInstitutionLocationPrefix(cleanLocation, fullContext)
 
+  const finalTitle = cleanTitle || cleanAiExtractedText(email.subject) || (imageCandidate ? '学术报告（海报）' : '学术报告')
+  const finalNotes = cleanAiExtractedText(extracted.notes) || (hasSubstantiveText ? rawBody : (imageCandidate ? '详见随附学术报告海报' : ''))
+
   return {
-    title: cleanTitle || extracted.title || '',
+    title: finalTitle,
     date: finalDate,
     time: finalTime,
-    speaker: cleanSpeaker || extracted.speaker || '',
-    location: cleanLocation || extracted.location || '',
-    notes: extracted.notes || rawBody || '',
+    speaker: cleanSpeaker,
+    location: cleanLocation,
+    notes: finalNotes,
     usedVision
   }
 }
@@ -1352,10 +1439,64 @@ export async function extractConferenceFromEmailWithAi(email, { config, posterIm
   }
 
   const rawBody = (email.body_text || email.body_html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-  const mailContent = `邮件主题: ${email.subject || '无'}\n发件人: ${email.from || email.sender || '无'}\n发信日期: ${email.date || '无'}\n邮件正文:\n${rawBody.slice(0, 3000)}`
+  const isPromptOnly = /请根据随附.*(?:海报|图片|文件).*提取/i.test(rawBody) ||
+    /^[【\[]?(?:随附海报图片|随附海报|随附图片|海报图片|仅随附海报)[】\]]?$/i.test(rawBody)
+  const hasSubstantiveText = rawBody.length > 20 && !isPromptOnly
+
+  const isVision = isModelVisionCapable(aiConfig)
+  const imageCandidate = posterImageUrl || email.poster_url || (Array.isArray(email.attachments) && email.attachments[0]?.url) || ''
+
+  if (!isVision && !hasSubstantiveText && Boolean(imageCandidate)) {
+    throw new Error(`您当前配置的模型（${aiConfig.model || '纯文本模型'}）不支持图像视觉识别。对于仅提供海报的会议条目，请在「AI 科研助手」->「模型配置」中切换为支持视觉的多模态模型（如 通义千问 Qwen2.5-VL / GPT-4o 等），或先输入/勾选文本内容。`)
+  }
+
+  const mailContent = `邮件主题: ${email.subject || '无'}
+发件人: ${email.from || email.sender || '无'}
+发信日期: ${email.date || '无'}
+邮件正文:
+${hasSubstantiveText ? rawBody.slice(0, 3000) : '（正文未提供文字描述，详见随附学术会议海报）'}`
+
+  let usedVision = false
+  let userContent = mailContent
+  let maxTokensToUse = 1000
+
+  const shouldTryVision = isVision && (!hasSubstantiveText || rawBody.length < 800) && Boolean(imageCandidate)
+  if (shouldTryVision) {
+    try {
+      const dataUrl = await convertImageUrlToDataUrl(imageCandidate, signal)
+      if (dataUrl) {
+        userContent = [
+          {
+            type: 'text',
+            text: `${hasSubstantiveText ? mailContent : '【提示：本学术会议日程信息主要记录在随附的会议海报中】'}\n\n【多模态会议海报 OCR 识别核心指令】：
+该条目已随附会议海报图片。请你仔细阅读并 OCR 识别海报图片中的全部文字，重点提取：
+1. 会议完整正式名称 (title)；
+2. 会议起始日期 (date) 与结束日期 (end_date)（格式 YYYY-MM-DD）；
+3. 举办城市 (city) 与具体会场地点 (location)；
+4. 主办或承办单位 (organizer)；
+5. 各关键截止时间（abstract_deadline / early_bird_deadline / registration_deadline）；
+6. 官方网址与报名网址；
+7. 会议主要日程议程与主题说明 (notes)。
+请务必完整、准确地填充到对应字段中！`
+          },
+          {
+            type: 'image_url',
+            image_url: { url: dataUrl }
+          }
+        ]
+        usedVision = true
+        maxTokensToUse = 1800
+      }
+    } catch (e) {
+      console.warn('获取会议海报图片进行视觉识别失败:', e)
+      if (!hasSubstantiveText) {
+        throw new Error(`获取学术会议海报图片失败（${e.message || '图片读取错误'}）。请检查图片有效性或网络。`)
+      }
+    }
+  }
 
   const systemPrompt = `你是一位专业的高校与科研院所课题组学术助手。
-你的任务是从给定的邮件内容（及可能附加的会议海报/通知图片）中，准确提取学术会议（如学术年会、研讨会、Colloquium、Symposium、高峰论坛等）的关键结构化信息。
+你的任务是从给定的邮件内容（${usedVision ? '以及随附的会议海报图片' : '及可能附加的会议通知图片'}）中，准确提取学术会议（如学术年会、研讨会、Colloquium、Symposium、高峰论坛等）的关键结构化信息。
 
 请按以下要求提取并输出 JSON：
 1. 完整会议名称 (title)：如“2026年天体物理与宇宙学前沿研讨会”；
@@ -1388,7 +1529,7 @@ export async function extractConferenceFromEmailWithAi(email, { config, posterIm
   "website_url": "https://...",
   "registration_url": "https://...",
   "notes": "会议核心说明"
-}`
+}幻觉防范：不要把指令提示字符串或空占位符输出到 title 或 notes 中。`
 
   let content = ''
   try {
@@ -1396,15 +1537,34 @@ export async function extractConferenceFromEmailWithAi(email, { config, posterIm
       config: aiConfig,
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: mailContent }
+        { role: 'user', content: userContent }
       ],
       temperature: 0.1,
-      maxTokens: 1000,
+      maxTokens: maxTokensToUse,
       jsonMode: true,
       signal
     })
   } catch (err) {
-    throw err
+    if (usedVision && hasSubstantiveText) {
+      console.warn('多模态会议海报识别失败，降级为文本识别:', err)
+      usedVision = false
+      content = await callAiCompletion({
+        config: aiConfig,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: mailContent }
+        ],
+        temperature: 0.1,
+        maxTokens: 1000,
+        jsonMode: true,
+        signal
+      })
+    } else {
+      if (usedVision && !hasSubstantiveText) {
+        throw new Error(`会议海报多模态视觉识别失败（${err.message || '模型调用异常'}）。当前大模型可能不支持图片输入或网络超时。请切换为支持视觉的多模态模型（如 Qwen2.5-VL / GPT-4o 等），或在左侧输入具体文字描述。`)
+      }
+      throw err
+    }
   }
 
   const extracted = extractJsonFromText(content)
@@ -1422,20 +1582,24 @@ export async function extractConferenceFromEmailWithAi(email, { config, posterIm
     return ''
   }
 
+  const finalTitle = cleanAiExtractedText(extracted.title) || cleanAiExtractedText(email.subject) || (imageCandidate ? '学术会议（海报）' : '学术会议')
+  const finalNotes = cleanAiExtractedText(extracted.notes) || (hasSubstantiveText ? rawBody.slice(0, 500) : (imageCandidate ? '详见随附学术会议海报' : ''))
+
   return {
-    title: (extracted.title || email.subject || '').trim(),
+    title: finalTitle,
     sub_type: extracted.sub_type || '研讨会',
     date: cleanDate(extracted.date),
     end_date: cleanDate(extracted.end_date),
-    city: extracted.city || '',
-    location: extracted.location || '',
-    organizer: extracted.organizer || '',
+    city: cleanAiExtractedText(extracted.city),
+    location: cleanAiExtractedText(extracted.location),
+    organizer: cleanAiExtractedText(extracted.organizer),
     abstract_deadline: cleanDate(extracted.abstract_deadline),
     early_bird_deadline: cleanDate(extracted.early_bird_deadline),
     registration_deadline: cleanDate(extracted.registration_deadline),
-    website_url: extracted.website_url || '',
-    registration_url: extracted.registration_url || '',
-    notes: extracted.notes || rawBody.slice(0, 500) || ''
+    website_url: cleanAiExtractedText(extracted.website_url),
+    registration_url: cleanAiExtractedText(extracted.registration_url),
+    notes: finalNotes,
+    usedVision
   }
 }
 
@@ -1699,4 +1863,150 @@ ${em.snippet}
   }
 
   return allResults
+}
+
+/**
+ * 从单篇文本中通过 AI 智能提取结构化通知字段
+ *
+ * @param {string} text - 原始通知文本
+ * @param {Object} options - 可选配置 { config, signal, attachments }
+ * @returns {Promise<Object>} 结构化通知对象
+ */
+export async function extractSingleNoticeWithAi(text, { config, signal, attachments = [], posterImageUrl } = {}) {
+  const aiConfig = config || loadAiConfig()
+  if (!aiConfig.baseUrl) {
+    throw new Error('未配置大模型 Base URL 地址，请在个人中心或设置中配置。')
+  }
+
+  const rawText = (text || '').trim()
+  const isPromptOnly = /请根据随附.*(?:海报|图片|文件).*提取/i.test(rawText) ||
+    /^[【\[]?(?:随附海报图片|随附海报|随附图片|海报图片|仅随附海报)[】\]]?$/i.test(rawText)
+  const hasSubstantiveText = rawText.length > 20 && !isPromptOnly
+
+  const imgAttachment = posterImageUrl || (Array.isArray(attachments) ? attachments.find(a =>
+    a.content_type?.startsWith('image/') || /\.(png|jpe?g|webp|gif)$/i.test(a.url || a.filename || '')
+  )?.url : '')
+
+  if (!hasSubstantiveText && !imgAttachment) {
+    throw new Error('通知文本内容为空')
+  }
+
+  const isVision = isModelVisionCapable(aiConfig)
+
+  if (!isVision && !hasSubstantiveText && Boolean(imgAttachment)) {
+    throw new Error(`您当前配置的模型（${aiConfig.model || '纯文本模型'}）不支持图像视觉识别。对于仅提供图片的通知条目，请在「AI 科研助手」->「模型配置」中切换为支持视觉的多模态模型（如 Qwen2.5-VL / GPT-4o 等），或先输入/勾选文本内容。`)
+  }
+
+  const todayStr = shanghaiToday()
+  const currentYear = parseInt(todayStr.slice(0, 4), 10) || 2026
+
+  let usedVision = false
+  let userContent = hasSubstantiveText ? rawText.slice(0, 4000) : '（正文未提供文字描述，详见随附通知附图）'
+  let maxTokensToUse = 1000
+
+  if (isVision && Boolean(imgAttachment) && (!hasSubstantiveText || rawText.length < 800)) {
+    try {
+      const dataUrl = await convertImageUrlToDataUrl(imgAttachment, signal)
+      if (dataUrl) {
+        userContent = [
+          {
+            type: 'text',
+            text: `${hasSubstantiveText ? rawText.slice(0, 3000) : '【提示：本通知信息主要记录在随附的通知附图中】'}\n\n【多模态通知图片 OCR 提取核心指令】：\n该条目已随附通知图片。请仔细阅读并 OCR 识别图片中的文字，提取通知标题 (title)、分类 (category)、重要程度 (importance)、起止日期 (start_date/end_date) 与详细正文 (content)。`
+          },
+          {
+            type: 'image_url',
+            image_url: { url: dataUrl }
+          }
+        ]
+        usedVision = true
+        maxTokensToUse = 1800
+      }
+    } catch (e) {
+      console.warn('获取通知图片进行视觉识别失败:', e)
+      if (!hasSubstantiveText) {
+        throw new Error(`获取通知附图失败（${e.message || '图片读取错误'}）。请检查图片有效性或网络。`)
+      }
+    }
+  }
+
+  const systemPrompt = `你是一位严谨高效的高校与科研院所课题组行政与教务助手。
+你的核心职责是从用户提供的通知通告${usedVision ? '及随附图片' : '文本'}中，精准提取结构化通知字段并返回严格的 JSON。
+当前系统基准时间：${todayStr}（基准年份：${currentYear} 年）。
+
+【输出格式要求】：
+请务必返回合法的 JSON 对象，格式严格如下：
+{
+  "title": "简短描述作为标题（15~35字，文字洗练准确，适合走马灯滚动和卡片标题，例如：东区综合楼9月22日电梯维保暂停运行、2026年研究生国家奖学金评选申请通知）",
+  "content": "详细通知内容摘要（保留核心通知事项、办理要求、影响时间与范围、联系人方式，支持段落换行）",
+  "category": "academic_affairs | holiday | facility | administrative | safety | general",
+  "importance": "urgent | important | normal",
+  "start_date": "通知生效或开始日期，格式 YYYY-MM-DD，若无法确认请留空",
+  "end_date": "时效截止日期，格式 YYYY-MM-DD（如申请截止时间、停水结束时间、放假结束时间；若无明确截止时效或长期有效则填空字符串 \"\"）"
+}
+幻觉防范：不要把指令提示字符串或空占位符输出到 title 或 content 中。`
+
+  let responseText = ''
+  try {
+    responseText = await callAiCompletion({
+      config: aiConfig,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent }
+      ],
+      temperature: 0.1,
+      maxTokens: maxTokensToUse,
+      jsonMode: true,
+      signal
+    })
+  } catch (err) {
+    if (usedVision && hasSubstantiveText) {
+      console.warn('多模态通知识别失败，降级为纯文本提取:', err)
+      usedVision = false
+      responseText = await callAiCompletion({
+        config: aiConfig,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: rawText ? rawText.slice(0, 4000) : '综合通知' }
+        ],
+        temperature: 0.1,
+        maxTokens: 1000,
+        jsonMode: true,
+        signal
+      })
+    } else {
+      if (usedVision && !hasSubstantiveText) {
+        throw new Error(`通知图片多模态视觉识别失败（${err.message || '模型调用异常'}）。当前大模型可能不支持图片输入或网络超时。请切换为支持视觉的多模态模型（如 Qwen2.5-VL / GPT-4o 等），或补充文字描述。`)
+      }
+      throw err
+    }
+  }
+
+  const parsed = extractJsonFromText(responseText)
+  if (!parsed || typeof parsed !== 'object') {
+    throw new Error('未能从模型回复中解析出有效的通知 JSON')
+  }
+
+  let cat = parsed.category || 'general'
+  if (!['academic_affairs', 'holiday', 'facility', 'administrative', 'safety', 'general'].includes(cat)) {
+    cat = 'general'
+  }
+  let imp = parsed.importance || 'normal'
+  if (!['urgent', 'important', 'normal'].includes(imp)) {
+    imp = 'normal'
+  }
+
+  const normalizedDates = normalizeNoticeDates(parsed.start_date, parsed.end_date, todayStr)
+
+  const finalTitle = cleanAiExtractedText(parsed.title) || (imgAttachment ? '综合事务通知（附图）' : '综合事务通知')
+  const finalContent = cleanAiExtractedText(parsed.content) || (hasSubstantiveText ? rawText : (imgAttachment ? '详见随附通知图片' : ''))
+
+  return {
+    title: finalTitle,
+    content: finalContent,
+    category: cat,
+    importance: imp,
+    start_date: normalizedDates.start_date,
+    end_date: normalizedDates.end_date,
+    attachments: Array.isArray(attachments) ? attachments : []
+  }
 }

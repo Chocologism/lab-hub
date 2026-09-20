@@ -249,3 +249,10 @@ export const noticeApi = {
   delete: (id) => api.delete(`/api/notices/${id}`),
 }
 
+export const scheduleImportApi = {
+  listPending: () => api.get('/api/schedule-imports/pending'),
+  createPending: (data) => api.post('/api/schedule-imports/pending', data),
+  resolvePending: (id, data) => api.post(`/api/schedule-imports/${id}/resolve`, data),
+  deletePending: (id) => api.delete(`/api/schedule-imports/${id}`),
+}
+

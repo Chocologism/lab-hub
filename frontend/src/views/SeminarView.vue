@@ -6,7 +6,7 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
 import { Draggable } from 'gsap/Draggable'
-import { seminarApi, arxivApi, talkApi, authApi, mailboxApi } from '../api/client'
+import { seminarApi, arxivApi, talkApi, authApi, mailboxApi, scheduleImportApi } from '../api/client'
 import { buildSeminarNoticeBody, parseExternalEmails, formatSeminarDateTime } from '../utils/smtpNotice'
 import ScheduleOverview from '../components/ScheduleOverview.vue'
 import ConferenceList from '../components/ConferenceList.vue'
@@ -16,6 +16,8 @@ import WaveInput from '../components/WaveInput.vue'
 import AttachmentLink from '../components/AttachmentLink.vue'
 import BaseDialog from '../components/BaseDialog.vue'
 import ScheduleImportDialog from '../components/ScheduleImportDialog.vue'
+import SmartPasteImportModal from '../components/SmartPasteImportModal.vue'
+import PendingImportsModal from '../components/PendingImportsModal.vue'
 import SeminarReminders from '../components/SeminarReminders.vue'
 import AppIcon from '../components/AppIcon.vue'
 import LoadingState from '../components/LoadingState.vue'
@@ -29,6 +31,36 @@ const router = useRouter()
 const members = ref([]), currentUser = ref(null), showImport = ref(false), abstractItem = ref(null), abstractText = ref(''), abstractTopic = ref(''), abstractError = ref('')
 const topicItem = ref(null), topicText = ref(''), topicError = ref(''), savingTopic = ref(false)
 const showSettings = ref(false), reminderSettings = ref({ abstract_reminder_days: 7, arxiv_reminder_days: 7 }), savingSettings = ref(false)
+
+// 文本智能导入与待处理协同队列
+const showSmartPasteModal = ref(false)
+const showPendingImportsModal = ref(false)
+const pendingImportsCount = ref(0)
+
+async function refreshPendingImportsCount() {
+  try {
+    const res = await scheduleImportApi.listPending()
+    pendingImportsCount.value = res.total ?? (Array.isArray(res.list) ? res.list.length : 0)
+  } catch (e) {
+    // 忽略未登录或网络异常
+  }
+}
+
+function handleSmartPasteSaved() {
+  load()
+  scheduleChanged()
+  refreshPendingImportsCount()
+}
+
+function handleSmartPastePending() {
+  refreshPendingImportsCount()
+}
+
+function handlePendingResolved() {
+  load()
+  scheduleChanged()
+  refreshPendingImportsCount()
+}
 
 const canManageSeminars = computed(() => {
   if (!currentUser.value) return false
@@ -542,7 +574,7 @@ watch(
       viewMode.value = 'conferences'
     } else if (newQuery?.tab === 'week' || newQuery?.view === 'week') {
       viewMode.value = 'week'
-    } else {
+    } else if (newQuery?.tab === 'timeline' || newQuery?.view === 'timeline' || newQuery?.target_seminar) {
       viewMode.value = 'timeline'
     }
     if (newQuery?.target_seminar) {
@@ -988,6 +1020,7 @@ onMounted(async () => {
   motionContext = gsap.context(() => {}, root.value)
   window.addEventListener('schedule-interest-updated', onGlobalInterestUpdated)
   await load()
+  refreshPendingImportsCount()
   if (route.query.seminar) selected.value = seminars.value.find(item => item.id === Number(route.query.seminar)) || null
 })
 onBeforeUnmount(() => {
@@ -1007,6 +1040,13 @@ onBeforeRouteLeave(async () => !draftList.value.length || await confirmAction('�
       </div>
       <div id="tour-seminars-header-actions" class="header-actions">
         <SeminarReminders />
+        <button id="tour-smart-paste-btn" class="button secondary smart-paste-btn" @click="showSmartPasteModal = true">
+          <AppIcon name="sparkle" />文本智能导入
+        </button>
+        <button v-if="pendingImportsCount > 0" id="tour-pending-queue-btn" class="button secondary pending-queue-btn" @click="showPendingImportsModal = true">
+          <AppIcon name="clock" />待处理导入
+          <span class="badge amber count-pill">{{ pendingImportsCount }}</span>
+        </button>
         <button v-if="currentUser?.role === 'admin'" class="button secondary" @click="openAssociationModal">
           <AppIcon name="user" />人员关联检测
         </button>
@@ -1210,6 +1250,19 @@ onBeforeRouteLeave(async () => !draftList.value.length || await confirmAction('�
     </BaseDialog>
 
     <ScheduleImportDialog :open="showImport" :members="members" @close="showImport = false" @saved="scheduleChanged(); notify('排期已导入')" />
+    <SmartPasteImportModal
+      :open="showSmartPasteModal"
+      :current-user="currentUser"
+      @close="showSmartPasteModal = false"
+      @saved="handleSmartPasteSaved"
+      @saved-to-pending="handleSmartPastePending"
+    />
+    <PendingImportsModal
+      :open="showPendingImportsModal"
+      :current-user="currentUser"
+      @close="showPendingImportsModal = false"
+      @resolved="handlePendingResolved"
+    />
     <!-- 主讲人便捷修改标题弹窗 -->
     <BaseDialog :open="!!topicItem" title="修改汇报标题" :busy="savingTopic" @close="topicItem = null">
       <form class="form-grid" @submit.prevent="saveTopic">
@@ -1713,6 +1766,20 @@ onBeforeRouteLeave(async () => !draftList.value.length || await confirmAction('�
 </template>
 
 <style scoped>
+.smart-paste-btn {
+  font-weight: 500;
+}
+.pending-queue-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.count-pill {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  line-height: 1.2;
+}
 .abstract-preview-wrap {
   margin-top: -6px;
   margin-bottom: 10px;
@@ -1963,13 +2030,13 @@ onBeforeRouteLeave(async () => !draftList.value.length || await confirmAction('�
 }
 
 .member-checkbox-card:hover {
-  border-color: rgba(184, 155, 248, 0.4);
-  background: rgba(184, 155, 248, 0.08);
+  border-color: var(--accent);
+  background: var(--raised);
 }
 
 .member-checkbox-card.checked {
   border-color: var(--accent);
-  background: rgba(184, 155, 248, 0.15);
+  background: var(--raised);
 }
 
 .member-checkbox-card input[type="checkbox"] {

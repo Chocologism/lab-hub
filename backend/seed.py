@@ -42,7 +42,7 @@ def init_clean_db(reset: bool = False):
                 role="admin",
                 can_manage_seminars=True,
                 tutorial_completed=False,
-                bio="Lab-Hub 课题组协作平台系统管理",
+                bio="LabOrbit 课题组协作平台系统管理",
             )
             db.add(admin)
             db.commit()

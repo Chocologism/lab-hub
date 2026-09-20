@@ -104,6 +104,8 @@ const GENERAL_STEPS = [
     keyHighlights: [
       '全学期组会排期日历与主讲人轮值表',
       '轮值汇报人可在线提交/更新报告题目与摘要',
+      '支持粘贴通知文本或海报附图，多模态 AI 智能提取报告/会议/通知',
+      '支持暂存到协同待处理队列，供管理成员审核后一键正式发布',
       '一键导出 .ics 日历订阅文件同步到手机日历'
     ],
     subSteps: [
@@ -146,6 +148,19 @@ const GENERAL_STEPS = [
         description: '点击任意一场组会卡片展开详情抽屉。轮值主讲人可在线填报报告题目与摘要，全组成员可下载课件与文献。',
         purposeNote: '查看详细议程并支持主讲人在线申报。',
         actionPrompt: '点击卡片可查看详情；轮值主讲人可在线填报摘要'
+      },
+      {
+        id: 'schedule_smart_paste',
+        targetId: 'tour-smart-paste-btn',
+        targetSelector: '#tour-smart-paste-btn, .smart-paste-btn',
+        targetRoute: '/seminars?tab=timeline',
+        placement: 'bottom',
+        requiresClick: false,
+        title: '文本与海报智能导入',
+        subtitle: '多模态 AI 智能提取与协同审核',
+        description: '无论收到微信通知、邮件正文还是会议海报图片，直接粘贴即可通过多模态 AI 智能提取报告/会议/通知字段。还可暂存到【待处理导入】协同队列，由他人或管理员审核发布。',
+        purposeNote: '极速录入学术日程，免去繁琐的人工敲字录入。',
+        actionPrompt: '点击【文本智能导入】即可体验粘贴文本或拖入海报一键解析'
       },
       {
         id: 'schedule_week_tab',
@@ -266,7 +281,7 @@ const GENERAL_STEPS = [
         requiresClick: false,
         title: '快速归档与定向分享',
         subtitle: '文献元数据自动提取',
-        description: '粘贴 arXiv 编号或 DOI 链接，系统将自动解析标题、作者与摘要；输入心得后可公开推荐或定向推送给合作同窗。',
+        description: '粘贴 arXiv 编号或 DOI 链接，系统将自动解析标题、作者与摘要（支持通过 Semantic Scholar 智能补全全文摘要）；输入心得后可公开推荐或定向推送给合作同窗。',
         purposeNote: '全组前沿文献归档与研读分享。',
         actionPrompt: '粘贴文献编号或链接即可自动解析元数据并分享'
       },

@@ -8,7 +8,7 @@ DATA_OUTPUT = 'scripts/data_d1.sql'
 
 os.makedirs('scripts', exist_ok=True)
 
-SCHEMA_DDL = """-- Cloudflare D1 Database Schema for LabHub
+SCHEMA_DDL = """-- Cloudflare D1 Database Schema for LabOrbit
 -- Fully compatible with SQLite & Cloudflare D1
 
 CREATE TABLE IF NOT EXISTS users (
@@ -237,6 +237,25 @@ CREATE TABLE IF NOT EXISTS user_cached_emails (
     fetched_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_cached_emails_user_uid ON user_cached_emails(user_id, msg_uid);
+
+CREATE TABLE IF NOT EXISTS pending_schedule_imports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    raw_text TEXT NOT NULL DEFAULT '',
+    inferred_type VARCHAR(50) NOT NULL DEFAULT 'talk',
+    parsed_data TEXT NOT NULL DEFAULT '{}',
+    image_urls TEXT NOT NULL DEFAULT '[]',
+    file_attachments TEXT NOT NULL DEFAULT '[]',
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    created_by_id INTEGER REFERENCES users(id),
+    created_by_name VARCHAR(100) DEFAULT '',
+    resolved_by_id INTEGER REFERENCES users(id),
+    resolved_by_name VARCHAR(100) DEFAULT '',
+    target_type VARCHAR(50) DEFAULT '',
+    target_id INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    resolved_at DATETIME
+);
+CREATE INDEX IF NOT EXISTS idx_pending_schedule_imports_status ON pending_schedule_imports(status);
 """
 
 def export():
@@ -269,7 +288,8 @@ def export():
         'issue_feedback',
         'feedback_replies',
         'user_mail_configs',
-        'user_cached_emails'
+        'user_cached_emails',
+        'pending_schedule_imports'
     ]
 
     sql_statements = [

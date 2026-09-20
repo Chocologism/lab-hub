@@ -9,6 +9,7 @@ import {
   extractScheduleFromEmailWithAi,
   extractConferenceFromEmailWithAi,
   extractNoticesFromEmailsWithAi,
+  extractSingleNoticeWithAi,
   normalizeNoticeDates,
   callAiCompletion,
 
@@ -345,6 +346,8 @@ describe('aiService - Multimodal Vision and Poster Extraction', () => {
   it('identifies vision-capable models by model name and configuration', () => {
     expect(isModelVisionCapable({ model: 'deepseek-flash' })).toBe(true)
     expect(isModelVisionCapable({ model: 'deepseek-v4.1' })).toBe(true)
+    expect(isModelVisionCapable({ model: 'deepseek-vl' })).toBe(true)
+    expect(isModelVisionCapable({ model: 'deepseek-vl2' })).toBe(true)
     expect(isModelVisionCapable({ model: 'gpt-4o' })).toBe(true)
     expect(isModelVisionCapable({ model: 'gpt-4o-mini' })).toBe(true)
     expect(isModelVisionCapable({ model: 'glm-4v' })).toBe(true)
@@ -450,7 +453,7 @@ describe('aiService - Multimodal Vision and Poster Extraction', () => {
       subject: '报告通知',
       from: 'admin@lab.edu',
       date: '2026-09-22',
-      body_text: '详见海报。',
+      body_text: '各位老师同学：本周五下午在学术交流中心会议室举办学术报告《空间引力波探测》，欢迎准时参加。详见海报。',
       poster_url: 'data:image/jpeg;base64,ZmFrZWltYWdlZGF0YQ=='
     }
 
@@ -505,6 +508,7 @@ describe('aiService - Multimodal Vision and Poster Extraction', () => {
     // 字符串形式自动推导
     expect(normalizeModelItem('deepseek-flash').supportsVision).toBe(true)
     expect(normalizeModelItem('deepseek-v4.1').supportsVision).toBe(true)
+    expect(normalizeModelItem('deepseek-vl').supportsVision).toBe(true)
     expect(normalizeModelItem('gpt-4o').supportsVision).toBe(true)
     expect(normalizeModelItem('qwen2.5-vl').supportsVision).toBe(true)
     expect(normalizeModelItem('deepseek-chat').supportsVision).toBe(false)
@@ -600,6 +604,149 @@ describe('aiService - Multimodal Vision and Poster Extraction', () => {
     expect(res.registration_deadline).toBe('2026-09-30')
     expect(res.website_url).toBe('https://astro2026.example.org')
     expect(res.registration_url).toBe('https://astro2026.example.org/reg')
+  })
+
+  it('extractConferenceFromEmailWithAi invokes multimodal vision when poster is provided and model is vision-capable', async () => {
+    let capturedBody = null
+    global.fetch = vi.fn().mockImplementation(async (url, opts) => {
+      if (typeof url === 'string' && url.includes('poster.jpg')) {
+        return {
+          ok: true,
+          blob: async () => new Blob(['dummy'], { type: 'image/jpeg' })
+        }
+      }
+      if (opts?.body) {
+        capturedBody = JSON.parse(opts.body)
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  title: '2026年黑洞天体物理研讨会',
+                  sub_type: '研讨会',
+                  date: '2026-11-05',
+                  end_date: '2026-11-08',
+                  city: '南京',
+                  location: '学术交流中心天文楼',
+                  organizer: '天文学会与空间科学实验室',
+                  notes: '研讨会海报提取摘要。'
+                })
+              }
+            }
+          ]
+        })
+      }
+    })
+
+    const res = await extractConferenceFromEmailWithAi(
+      { subject: '', body_text: '', poster_url: 'https://example.com/poster.jpg' },
+      {
+        config: {
+          baseUrl: 'https://api.openai.com/v1',
+          model: 'gpt-4o', // vision-capable
+          apiKey: 'sk-test'
+        },
+        posterImageUrl: 'https://example.com/poster.jpg'
+      }
+    )
+
+    expect(capturedBody).toBeTruthy()
+    const userMsg = capturedBody.messages.find(m => m.role === 'user')
+    expect(Array.isArray(userMsg.content)).toBe(true)
+    const imgItem = userMsg.content.find(item => item.type === 'image_url')
+    expect(imgItem).toBeTruthy()
+    expect(res.title).toBe('2026年黑洞天体物理研讨会')
+    expect(res.city).toBe('南京')
+    expect(res.usedVision).toBe(true)
+  })
+
+  it('extractConferenceFromEmailWithAi throws friendly error when non-vision model tries to parse image without text', async () => {
+    await expect(
+      extractConferenceFromEmailWithAi(
+        { subject: '', body_text: '' },
+        {
+          config: {
+            baseUrl: 'https://api.openai.com/v1',
+            model: 'deepseek-chat', // text-only model
+            apiKey: 'sk-test'
+          },
+          posterImageUrl: 'https://example.com/poster.jpg'
+        }
+      )
+    ).rejects.toThrow(/不支持图像视觉识别/)
+  })
+
+  it('extractConferenceFromEmailWithAi sanitizes prompt instructions from title and notes', async () => {
+    global.fetch = vi.fn().mockImplementation(async () => ({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                title: '请根据随附的海报图片内容，详细识别并提取完整的结构化信息。',
+                notes: '请根据随附的海报图片内容，详细识别并提取完整的结构化信息。',
+                city: '北京'
+              })
+            }
+          }
+        ]
+      })
+    }))
+
+    const res = await extractConferenceFromEmailWithAi(
+      { subject: '引力波年会', body_text: '正文说明内容' },
+      {
+        config: {
+          baseUrl: 'https://api.openai.com/v1',
+          model: 'deepseek-chat',
+          apiKey: 'sk-test'
+        }
+      }
+    )
+
+    expect(res.title).toBe('引力波年会')
+    expect(res.notes).not.toContain('请根据随附')
+    expect(res.city).toBe('北京')
+  })
+
+  it('extractSingleNoticeWithAi parses notice metadata via AI successfully', async () => {
+    global.fetch = vi.fn().mockImplementation(async () => ({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                title: '2026年研究生国家奖学金评选申请通知',
+                content: '请各位同学于9月25日前提交国家奖学金申请表至行政办公室。',
+                category: 'academic_affairs',
+                importance: 'important',
+                start_date: '2026-09-18',
+                end_date: '2026-09-25'
+              })
+            }
+          }
+        ]
+      })
+    }))
+
+    const res = await extractSingleNoticeWithAi('请各位同学于9月25日前提交国家奖学金申请表至行政办公室。', {
+      config: {
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'deepseek-chat',
+        apiKey: 'sk-test'
+      }
+    })
+
+    expect(res.title).toBe('2026年研究生国家奖学金评选申请通知')
+    expect(res.category).toBe('academic_affairs')
+    expect(res.importance).toBe('important')
+    expect(res.start_date).toBe('2026-09-18')
+    expect(res.end_date).toBe('2026-09-25')
   })
 
   it('extractNoticesFromEmailsWithAi identifies academic affairs and facility notices while excluding talks', async () => {

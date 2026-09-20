@@ -15,6 +15,7 @@ import favorites from './routes/favorites';
 import mailbox from './routes/mailbox';
 import notices from './routes/notices';
 import system from './routes/system';
+import scheduleImports from './routes/scheduleImports';
 
 const app = new Hono<{ Bindings: Env }>().basePath('/api');
 
@@ -30,7 +31,7 @@ app.use('*', async (c, next) => {
 app.get('/health', (c) => {
   return c.json({
     status: 'healthy',
-    service: 'Lab-Hub Serverless API (Cloudflare Pages Functions + D1 + R2)',
+    service: 'LabOrbit Serverless API (Cloudflare Pages Functions + D1 + R2)',
     timestamp: new Date().toISOString()
   });
 });
@@ -50,6 +51,7 @@ app.route('/favorites', favorites);
 app.route('/mailbox', mailbox);
 app.route('/notices', notices);
 app.route('/system', system);
+app.route('/schedule-imports', scheduleImports);
 
 
 export const onRequest = handle(app);

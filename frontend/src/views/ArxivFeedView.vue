@@ -37,6 +37,7 @@
     <section id="tour-arxiv-toolbar" class="feed-toolbar"><div class="segmented" aria-label="文献筛选"><button v-for="option in scopes" :key="option.id" :class="{ active: scope === option.id }" @click="changeScope(option.id)">{{ option.label }}</button></div><span class="count-label">{{ feed.length }} 篇</span></section>
     <LoadingState v-if="loading" message="正在更新文献流" />
     <section v-else-if="loadError" class="empty-state"><AppIcon name="warning" :size="28" /><h2>暂时无法读取文献流</h2><p>{{ loadError }}</p><button class="button button-quiet" @click="loadFeed">重试</button></section>
+    <section v-else-if="!feed.length" class="empty-state"><AppIcon name="file-text" :size="28" /><h2>这里还没有文献</h2><p>从上方录入一篇值得组内讨论的论文。</p></section>
     <section v-else class="paper-list">
       <article
         v-for="(paper, pIdx) in feed"
@@ -46,55 +47,60 @@
         :class="{ featured: paper.recommender?.identity === 'teacher' || paper.is_pinned, 'seminar-today': paper.is_seminar_today }"
       >
         <div class="paper-meta">
-          <span :class="['badge', paper.visibility === 'direct' ? 'amber' : 'cyan']">{{ paper.visibility === 'direct' ? '定向推荐' : '公开推荐' }}</span>
-          <span v-if="paper.is_seminar_today" class="priority-label seminar-priority">今日组会</span>
-          <span v-else-if="paper.recommender?.identity === 'teacher' || paper.is_teacher_pinned" class="priority-label">导师重点</span>
-          <span v-else-if="paper.is_pinned" class="priority-label">置顶推荐</span>
-          <span>{{ paper.published_date }}</span>
-          <span>{{ paper.journal || paper.primary_category || 'arXiv' }}</span>
-          <a class="pdf-link button small secondary" :href="paperRead(paper)" target="_blank" rel="noreferrer">
-            <span>{{ paperReadLabel(paper) }}</span>
-          </a>
+          <div class="paper-meta-info">
+            <span :class="['badge', paper.visibility === 'direct' ? 'amber' : 'cyan']">{{ paper.visibility === 'direct' ? '定向推荐' : '公开推荐' }}</span>
+            <span v-if="paper.is_seminar_today" class="priority-label seminar-priority">今日组会</span>
+            <span v-else-if="paper.recommender?.identity === 'teacher' || paper.is_teacher_pinned" class="priority-label">导师重点</span>
+            <span v-else-if="paper.is_pinned" class="priority-label">置顶推荐</span>
+            <span class="meta-date">{{ paper.published_date }}</span>
+            <span class="meta-category" :title="paper.journal || paper.primary_category || 'arXiv'">{{ paper.journal || paper.primary_category || 'arXiv' }}</span>
+          </div>
 
-          <!-- 与AI讨论按键：仅在用户配置好大模型并测试连通后显示 -->
-          <button
-            v-if="isAiReady && paper.arxiv_id"
-            type="button"
-            class="discuss-ai-btn button small secondary"
-            title="跳转至 AI 助手并基于全文展开深度讨论"
-            @click="handleDiscussWithAi(paper)"
-          >
-            <AppIcon name="chats" :size="12" />
-            <span>与AI讨论</span>
-          </button>
+          <div class="paper-meta-actions">
+            <a class="pdf-link button small secondary" :href="paperRead(paper)" target="_blank" rel="noreferrer">
+              <span>{{ paperReadLabel(paper) }}</span>
+            </a>
 
-          <!-- AI 翻译与多语言翻转控制 -->
-          <template v-if="isAiReady">
+            <!-- 与AI讨论按键：仅在用户配置好大模型并测试连通后显示 -->
             <button
-              v-if="!getPaperTranslation(paper)"
+              v-if="isAiReady && paper.arxiv_id"
               type="button"
-              class="translate-action-btn button small secondary"
-              :disabled="translatingIds.has(getPaperKey(paper))"
-              :title="translatingIds.has(getPaperKey(paper)) ? '正在使用大模型翻译中...' : '使用大模型将标题与摘要翻译为学术中文'"
-              @click="handleTranslatePaper(paper)"
+              class="discuss-ai-btn button small secondary"
+              title="跳转至 AI 助手并基于全文展开深度讨论"
+              @click="handleDiscussWithAi(paper)"
             >
-              <AppIcon v-if="translatingIds.has(getPaperKey(paper))" name="undo" class="spin-icon" :size="12" />
-              <AppIcon v-else name="translate" :size="12" />
-              <span>{{ translatingIds.has(getPaperKey(paper)) ? '翻译中…' : '翻译' }}</span>
+              <AppIcon name="chats" :size="12" />
+              <span>与AI讨论</span>
             </button>
 
-            <button
-              v-else
-              type="button"
-              class="translate-flip-btn button small"
-              :class="isChineseView(paper) ? 'is-zh' : 'is-en secondary'"
-              :title="isChineseView(paper) ? '点击翻转查看英文原文卡片' : '点击翻转查看中文翻译卡片'"
-              @click="togglePaperLang(paper)"
-            >
-              <AppIcon name="translate" :size="12" />
-              <span>{{ isChineseView(paper) ? '译文 (中)' : '原文 (EN)' }}</span>
-            </button>
-          </template>
+            <!-- AI 翻译与多语言翻转控制 -->
+            <template v-if="isAiReady">
+              <button
+                v-if="!getPaperTranslation(paper)"
+                type="button"
+                class="translate-action-btn button small secondary"
+                :disabled="translatingIds.has(getPaperKey(paper))"
+                :title="translatingIds.has(getPaperKey(paper)) ? '正在使用大模型翻译中...' : '使用大模型将标题与摘要翻译为学术中文'"
+                @click="handleTranslatePaper(paper)"
+              >
+                <AppIcon v-if="translatingIds.has(getPaperKey(paper))" name="undo" class="spin-icon" :size="12" />
+                <AppIcon v-else name="translate" :size="12" />
+                <span>{{ translatingIds.has(getPaperKey(paper)) ? '翻译中…' : '翻译' }}</span>
+              </button>
+
+              <button
+                v-else
+                type="button"
+                class="translate-flip-btn button small"
+                :class="isChineseView(paper) ? 'is-zh' : 'is-en secondary'"
+                :title="isChineseView(paper) ? '点击翻转查看英文原文卡片' : '点击翻转查看中文翻译卡片'"
+                @click="togglePaperLang(paper)"
+              >
+                <AppIcon name="translate" :size="12" />
+                <span>{{ isChineseView(paper) ? '译文 (中)' : '原文 (EN)' }}</span>
+              </button>
+            </template>
+          </div>
         </div>
         <div class="paper-main" :class="{ 'card-in-chinese': isChineseView(paper) }">
           <Transition name="paper-flip" mode="out-in">
@@ -465,7 +471,7 @@ function handleRecommendBodyClick(paper, event) {
 .paper-row {
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   padding: 21px;
   padding-right: 347px;
   min-height: 220px;
@@ -475,11 +481,6 @@ function handleRecommendBodyClick(paper, event) {
   background: var(--panel);
   transition: border-color .2s ease, box-shadow .2s ease;
   animation: paperRowIn 0.28s ease-out;
-  content-visibility: auto;
-  contain-intrinsic-size: auto 240px;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 @keyframes paperRowIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -494,8 +495,42 @@ function handleRecommendBodyClick(paper, event) {
   border-left: 3px solid var(--accent);
   background: color-mix(in srgb, var(--accent) 3.5%, var(--panel));
 }
-.paper-meta { display: grid; width: 105px; flex: 0 0 105px; gap: 5px; }
+.paper-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 120px;
+  flex: 0 0 120px;
+  gap: 12px;
+}
 
+.paper-meta-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.paper-meta-info .meta-date,
+.paper-meta-info .meta-category {
+  font-size: 11px;
+  color: var(--muted);
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.paper-meta-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+  width: 100%;
+}
+
+.paper-meta-actions .pdf-link,
+.paper-meta .discuss-ai-btn,
+.paper-meta .translate-action-btn,
+.paper-meta .translate-flip-btn,
 .discuss-ai-btn,
 .translate-action-btn,
 .translate-flip-btn {
@@ -512,6 +547,8 @@ function handleRecommendBodyClick(paper, event) {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   box-sizing: border-box;
+  position: static;
+  margin: 0;
 }
 
 .discuss-ai-btn {
@@ -754,23 +791,6 @@ function handleRecommendBodyClick(paper, event) {
   gap: 8px;
   width: 100%;
 }
-.paper-meta .pdf-link {
-  position: absolute;
-  left: 21px;
-  bottom: 21px;
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 32px;
-  height: 32px;
-  padding: 0 14px;
-  font-size: 12px;
-  line-height: 1;
-  border-radius: 9999px;
-  box-sizing: border-box;
-}
-
 
 @media (max-width: 768px) {
   .page-shell { padding: 20px 14px 96px; }
@@ -821,32 +841,35 @@ function handleRecommendBodyClick(paper, event) {
   }
   .paper-meta {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    flex-direction: column;
     width: 100%;
     flex: none;
     gap: 8px;
   }
-  .paper-meta .pdf-link {
-    position: static;
-    margin: 0 0 0 auto;
-    display: inline-flex;
+  .paper-meta-info {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    min-height: 26px;
-    height: 26px;
-    padding: 0 12px;
-    font-size: 11px;
-    line-height: 1;
-    border-radius: 9999px;
-    box-sizing: border-box;
-    white-space: nowrap;
+    gap: 8px;
   }
-  .paper-meta .discuss-ai-btn,
-  .paper-meta .translate-action-btn,
-  .paper-meta .translate-flip-btn {
+  .paper-meta-actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 2px;
+  }
+  .paper-meta-actions .pdf-link,
+  .paper-meta-actions .discuss-ai-btn,
+  .paper-meta-actions .translate-action-btn,
+  .paper-meta-actions .translate-flip-btn {
     width: auto;
     padding: 0 10px;
+    height: 28px;
+    border-radius: 8px;
+    margin: 0;
   }
   .paper-main h2 {
     font-size: 16px;
