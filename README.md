@@ -130,8 +130,8 @@
 克隆代码后直接运行根目录的启动脚本。脚本会自动检测 Python 环境、安装后端依赖、构建前端并启动服务：
 
 ```bash
-git clone https://github.com/Chocologism/lab-hub.git
-cd lab-hub
+git clone https://github.com/Chocologism/lab-orbit.git
+cd lab-orbit
 chmod +x start.sh
 ./start.sh
 ```
@@ -169,7 +169,7 @@ docker compose -f deploy/docker-compose.yml up -d
 3. **构建并发布**：
    ```bash
    npm run build
-   npx wrangler pages deploy dist --project-name lab-hub
+   npx wrangler pages deploy dist --project-name lab-orbit
    ```
 
 具体配置说明与数据迁移步骤可参考 [Cloudflare 部署指南](docs/CLOUDFLARE_DEPLOYMENT.md)。
@@ -322,8 +322,8 @@ LabOrbit is structured as a decoupled frontend-backend application with two depl
 Clone the repository and run the start script, which sets up the Python environment, installs dependencies, builds the frontend, and launches the service:
 
 ```bash
-git clone https://github.com/Chocologism/lab-hub.git
-cd lab-hub
+git clone https://github.com/Chocologism/lab-orbit.git
+cd lab-orbit
 chmod +x start.sh
 ./start.sh
 ```
@@ -361,7 +361,7 @@ Deploy directly to Cloudflare's free tier (Pages + D1 database + R2 storage):
 3. **Build & Deploy**:
    ```bash
    npm run build
-   npx wrangler pages deploy dist --project-name lab-hub
+   npx wrangler pages deploy dist --project-name lab-orbit
    ```
 
 For detailed configuration steps, see the [Cloudflare Deployment Guide](docs/CLOUDFLARE_DEPLOYMENT.md).

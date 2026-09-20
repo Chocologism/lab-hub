@@ -51,8 +51,8 @@ describe('research group calendar', () => {
     const ics = weekScheduleIcs([seminarItem, talkItem], '课题组周日程', new Date('2026-01-01T00:00:00Z'))
     expect(ics).toContain('BEGIN:VCALENDAR')
     expect(ics).toContain('X-WR-CALNAME:课题组周日程')
-    expect(ics).toContain('UID:seminar-1-2026-12-31@lab-hub.local')
-    expect(ics).toContain('UID:talk-10-2026-12-31@lab-hub.local')
+    expect(ics).toContain('UID:seminar-1-2026-12-31@laborbit.local')
+    expect(ics).toContain('UID:talk-10-2026-12-31@laborbit.local')
     expect(ics).toContain('SUMMARY:[组会] 题目 (甲)')
     expect(ics).toContain('SUMMARY:[学术报告] 星系巡天进展 (李教授)')
     expect(ics).toContain('arXiv 分享: 丙 (2609.12345)')
@@ -95,7 +95,7 @@ describe('research group calendar', () => {
     }
     const ics = weekScheduleIcs([confItem], '学术日程', new Date('2026-01-01T00:00:00Z'))
     expect(ics).toContain('SUMMARY:[学术会议] 全国星系宇宙学年会 (国家天文台)')
-    expect(ics).toContain('UID:conference-99-2026-10-15@lab-hub.local')
+    expect(ics).toContain('UID:conference-99-2026-10-15@laborbit.local')
     expect(ics.replace(/\r\n /g, '')).toContain('会议会期: 2026-10-15 至 2026-10-18')
     expect(ics.replace(/\r\n /g, '')).toContain('地点/网址: 北京国际会议中心')
 

@@ -23,7 +23,7 @@ const form = reactive({
   lab_name: '',
   lab_short_name: '',
   site_slogan: '课题组内部科研协作与知识管理平台',
-  site_title: 'Lab-Hub',
+  site_title: 'LabOrbit',
   invite_code: 'LAB-2026',
   institution: '',
   default_location: '学院研讨室 / 腾讯会议',
@@ -84,7 +84,7 @@ async function handleCompleteSetup() {
       lab_name: form.lab_name.trim(),
       lab_short_name: form.lab_short_name.trim().toUpperCase(),
       site_slogan: form.site_slogan.trim(),
-      site_title: form.site_title.trim() || 'Lab-Hub',
+      site_title: form.site_title.trim() || 'LabOrbit',
       invite_code: form.invite_code.trim().toUpperCase(),
       institution: form.institution.trim(),
       default_location: form.default_location.trim(),
@@ -128,7 +128,7 @@ async function handleCompleteSetup() {
           <AppIcon name="sparkles" class="badge-icon" />
           <span>首次部署向导</span>
         </div>
-        <h1 class="setup-title">欢迎使用 Lab-Hub</h1>
+        <h1 class="setup-title">欢迎使用 LabOrbit</h1>
         <p class="setup-subtitle">
           检测到系统尚未初始化。仅需 2 步即可完成超级管理员配置与课题组平台定制。
         </p>

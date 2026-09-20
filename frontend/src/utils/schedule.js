@@ -87,8 +87,8 @@ export function seminarIcs(item, now = new Date()) {
   const start = seminarTime(item)
   if (!Number.isFinite(start)) throw new Error('请先修正组会日期与时间，再加入日历。')
   return [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Lab-Hub//Seminars//CN', 'CALSCALE:GREGORIAN',
-    'BEGIN:VEVENT', `UID:seminar-${item.id}@lab-hub.local`, `DTSTAMP:${utcStamp(now)}`,
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//LabOrbit//Seminars//CN', 'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT', `UID:seminar-${item.id}@laborbit.local`, `DTSTAMP:${utcStamp(now)}`,
     `DTSTART:${utcStamp(new Date(start))}`, `DTEND:${utcStamp(new Date(start + 2 * 3600000))}`,
     `SUMMARY:${escapeIcs(`[组会] ${item.topic} (${item.presenter_name})`)}`,
     `LOCATION:${escapeIcs(item.location)}`,
@@ -101,7 +101,7 @@ export function weekScheduleIcs(eventsList, calendarName = '课题组周日程',
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Lab-Hub//WeeklySchedule//CN',
+    'PRODID:-//LabOrbit//WeeklySchedule//CN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     `X-WR-CALNAME:${escapeIcs(calendarName)}`,
@@ -118,7 +118,7 @@ export function weekScheduleIcs(eventsList, calendarName = '课题组周日程',
     const durationMs = (isSeminar ? 2 : (isConference ? 8 : 1.5)) * 3600 * 1000
     const endMs = startMs + durationMs
 
-    const uid = `${item.type || 'event'}-${item.id}-${item.date}@lab-hub.local`
+    const uid = `${item.type || 'event'}-${item.id}-${item.date}@laborbit.local`
     const summary = isSeminar
       ? `[组会] ${item.topic || item.title || '工作汇报'} (${item.presenter_name || item.speaker || '待定'})`
       : isConference
