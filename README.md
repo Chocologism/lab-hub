@@ -14,6 +14,7 @@
   <a href="#-中文文档"><img src="https://img.shields.io/badge/文档-简体中文-blue.svg" alt="Chinese Doc"></a>
   <a href="#-english-documentation"><img src="https://img.shields.io/badge/Document-English-green.svg" alt="English Doc"></a>
   <img src="https://img.shields.io/badge/License-MIT-emerald.svg" alt="License">
+  <img src="https://img.shields.io/badge/Tests-369%20passed-brightgreen.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Python-3.11+-3776AB.svg?logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Vue.js-3.x-4FC08D.svg?logo=vuedotjs&logoColor=white" alt="Vue 3">
   <img src="https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white" alt="FastAPI">
@@ -51,11 +52,11 @@
 
 👉 **[点击直接体验 LabOrbit 在线演示版 (GitHub Pages)](https://chocologism.github.io/lab-orbit/)**
 
-- **免密秒进**：无需注册或登录，默认以组员「陈晨（博士生）」身份直接进入完整工作台；
+- **免密秒进**：无需注册或登录，默认以课题组负责人「李华（教授/管理员）」身份直接进入管理工作台；
 - **全套预置数据**：预填天体物理与交叉科学课题组真实学术数据（组会排期、arXiv 推荐精选、通知公告、研讨评论与经典教材）；
-- **新手引导向导**：右下角常驻演示浮窗，点击 `🎓 功能向导` 即可启动完整的高亮交互式漫游向导；
-- **多角色切换**：浮窗内支持在「导师 / PI」与「学生 / 组员」视角间一键切换；
-- **纯前端沙盒**：数据变更保存在浏览器本地（`localStorage`），随时可点击 `🔄 重置` 恢复出厂状态。
+- **角色专属向导**：右下角常驻演示控制浮窗，点击 `🎓 功能向导` 启动交互式引导；管理员与组员视角各自适配了针对性的功能漫游向导；
+- **双重视角切换**：浮窗内支持在「管理员 / 课题组长」与「普通组员 / 研究生」视角间一键无缝切换，体验不同角色的权限与界面设计；
+- **纯前端沙盒**：数据基于浏览器本地（`localStorage`）隔离持久化，配备半透明演示水印与一键 `🔄 重置` 恢复出厂状态。
 
 ---
 
@@ -100,7 +101,7 @@
 
 ```
 • 1. 工作台主页 (Home Dashboard)
-  ├─ 快捷入口：一键录入 arXiv 推荐、快速登记组会日程
+  ├─ 快捷入口：一键录入 arXiv 推荐、快速登记日程与智能粘贴导入
   ├─ 通知公告：重要截稿日期与讲座滚动的公告栏
   ├─ 每周日程：按周查看全组会议安排与个人倒计时看板
   └─ 个人待办：下一次主讲或文献分享的到期提醒
@@ -112,28 +113,35 @@
   ├─ 日历导出：支持生成标准 iCalendar (.ics) 文件同步至手机或日历软件
   └─ 批量导入：支持解析带有主讲人和主题的 CSV 排期表
 
-• 3. 文献推荐与研讨 (Literature Hub)
+• 3. 智能粘贴与协作待审 (Smart Paste & Pending Queue)
+  ├─ 智能识别：支持一键粘贴纯文本通知、长排期表或拖入学术海报截图
+  ├─ 多模态解析：借助 AI 视觉与启发式正则引擎自动提取时间、地点、报告人与摘要
+  ├─ 分类推断：自动判断为学术报告、组会、文献推荐或通知
+  └─ 协作待审队列：成员提交草案进入待审池，管理员统一批量审核并一键同步入历
+
+• 4. 文献推荐与集中文献库 (Literature Hub & Archive)
   ├─ 自动解析：输入 arXiv 编号/链接或 DOI，异步获取标题、作者与摘要
   ├─ 范围控制：支持“公开推荐”（全组可见）与“定向推荐”（仅指定成员可见）
   ├─ 重点标记：课题组负责人（PI）推荐带有高亮徽章
-  └─ 研讨评论：组员标记阅读状态，沉淀简短讨论与笔记
+  ├─ 研讨评论：组员标记阅读状态，沉淀简短讨论与笔记
+  └─ 集中文献库：汇聚全组学术文献，支持按来源（推荐/组会/定向收录）过滤与全字段检索
 
-• 4. 教材资料文库 (Resource Hub)
+• 5. 教材资料文库 (Resource Hub)
   ├─ 分类归档：按基础理论、专业方向及工具库分门别类
   ├─ 检索定位：支持拼音首字母筛选与常用资料星标收藏
   └─ 资源链接：汇总在线教程、配套 GitHub 代码仓库与下载链接
 
-• 5. 学术邮箱与海报解析 (Mailbox & OCR)
+• 6. 学术邮箱与海报解析 (Mailbox & OCR)
   ├─ 邮箱互联：支持配置高校或研究所 IMAP/SMTP 邮箱
   ├─ 海报识别：提取报告海报中的时间、地点与报告人信息
   └─ 一键入历：确认信息后直接添加到组内公共日程
 
-• 6. 学术 AI 辅助 (AI Assistant)
+• 7. 学术 AI 辅助 (AI Assistant)
   ├─ 公式渲染：基于 KaTeX 实时排版 LaTeX 数学公式
   ├─ 翻译与润色：保留专业术语与公式符号的学术翻译
   └─ 接口兼容：支持对接主流大模型 API 服务
 
-• 7. 系统与权限设置 (Settings & Governance)
+• 8. 系统与权限设置 (Settings & Governance)
   ├─ 注册邀请码：内置邀请码验证（默认 LAB-2026），避免无关人员注册
   ├─ 角色管理：管理员 (Admin)、教师/负责人 (Teacher)、组员 (Student) 三级权限
   └─ 界面配置：支持深色/浅色及多套界面主题切换
@@ -211,12 +219,16 @@ docker compose -f deploy/docker-compose.yml up -d
 
 ### 3. 常见工作流程
 
-- **文献推荐与交流**：
-  在页面右上角点击“推荐文献”，填入 arXiv 编号或 DOI，系统会自动获取文献标题、作者和摘要。如果文献尚处于讨论初期或只想与特定师兄师姐交流，可选择“定向推荐”仅指定人员可见。
+- **智能粘贴与海报解析入历**：
+  点击导航栏或工作台的“智能粘贴”，直接粘贴通知文本、微信/邮件消息，或拖入讲座海报截图。系统会自动提取时间、地点、报告人与摘要等关键元数据，确认无误后可一键加入公共日程或提交待审池。
+- **协作排期与审核流转**：
+  组员提交的学术会议或讲座草案会自动沉淀至“待审队列”；管理员与导师可在专属面板中批量审阅、一键通过或调整细节，兼顾组员共建活力与团队日程的准确性。
+- **文献推荐与集中文献库沉淀**：
+  在页面右上角点击“推荐文献”，填入 arXiv 编号或 DOI，系统会自动解析元信息。支持“公开推荐”或面向导师/特定组员的“定向推荐”。全组推荐与组会分享的论文将自动归集于“文献库”，支持多维度筛选检索与阅读状态追踪。
 - **组会排期与日历同步**：
-  学期初管理员可通过 CSV 文件一次性导入排期表。主讲人会提前收到待办提示，补充摘要和课件。组员可在日程页面点击“导出日历”，将安排同步到手机系统日历中。
-- **参考资料整理**：
-  在“资料整合”中录入组内常用教材、参考书与讲义链接，支持按拼音字母检索，方便新进组同学查阅。
+  学期初管理员可通过 CSV 文件一次性批量导入排期。系统在轮值到期前自动提示主讲人补充题目与课件，组员可随时导出 `.ics` 日历文件同步至手机与个人日程。
+- **参考资料与文库整理**：
+  在“资料整合”中录入组内常用教材、参考书与讲义链接，支持按拼音字母检索与星标收藏，大幅降低新成员进组的学习门槛。
 
 ---
 
@@ -273,11 +285,11 @@ Experience the visual design and full interactive workflow without deploying any
 
 👉 **[Launch LabOrbit Live Demo (GitHub Pages)](https://chocologism.github.io/lab-orbit/)**
 
-- **Instant Zero-Auth Access**: Jump straight into the full research dashboard as student researcher "Chen Chen (PhD Student)";
+- **Instant Zero-Auth Access**: Jump straight into the full research dashboard as lab director "Prof. Hua Li (Advisor / Admin)";
 - **Realistic Preloaded Dataset**: Seeded with astrophysics research group data including scheduled seminars, curated arXiv preprints, announcements, and resources;
-- **Interactive Tour**: Launch the `🎓 Feature Tour` from the bottom-right demo floating pill for a guided walkthrough of core features;
-- **Role Switching**: Effortlessly toggle between "Mentor / PI" and "Student / Researcher" perspectives;
-- **Local Sandbox**: Data modifications are saved in your browser (`localStorage`) with a one-click `🔄 Reset` to factory state.
+- **Role-Specific Tours**: Launch the `🎓 Feature Tour` from the bottom-right demo floating pill for a guided walkthrough tailored specifically to either the Admin or Student perspective;
+- **Role Switching**: Effortlessly toggle between "Administrator / PI" and "Student / Researcher" views to explore their respective permissions and interfaces;
+- **Local Sandbox**: Data modifications are saved in your browser (`localStorage`) with a discreet demonstration watermark and a one-click `🔄 Reset` to factory state.
 
 ---
 
@@ -322,7 +334,7 @@ LabOrbit is structured as a decoupled frontend-backend application with two depl
 
 ```
 • 1. Home Dashboard
-  ├─ Quick Actions: Paste arXiv IDs or add seminar events quickly
+  ├─ Quick Actions: Paste arXiv IDs, add seminar events, or trigger Smart Paste
   ├─ Notices: Important submission deadlines and rolling announcements
   ├─ Weekly Schedule: Interactive week-by-week group schedule
   └─ Countdown Badges: Timers for upcoming personal talks and journal clubs
@@ -334,28 +346,35 @@ LabOrbit is structured as a decoupled frontend-backend application with two depl
   ├─ Calendar Sync: Standard iCalendar (.ics) export for phone/desktop calendars
   └─ Batch Import: CSV import for semester-long schedules
 
-• 3. Collaborative Literature Hub
+• 3. Smart Paste & Collaborative Pending Queue
+  ├─ Multimodal Parsing: Paste raw text notices, multi-line schedules, or drop poster screenshots
+  ├─ AI & Heuristic Classifier: Automatically extracts date, time, speaker, venue, and abstracts
+  ├─ Categorization: Classifies inputs into seminars, conferences, literature, or announcements
+  └─ Pending Review Queue: Submissions from members enter a moderation pool for PI/Admin approval
+
+• 4. Collaborative Literature Hub & Curated Library
   ├─ Auto Metadata: Fetches title, authors, and abstract via arXiv ID or DOI
   ├─ Visibility Control: Public (lab-wide) or Directed (selected peers/advisors)
   ├─ Highlights: Distinct badges for PI-recommended papers
-  └─ Discussions: Reading status markers and comments for lab discussions
+  ├─ Discussions: Reading status markers and comments for lab discussions
+  └─ Curated Library: Unified archive of all lab papers with source filters and keyword search
 
-• 4. Resource & Textbook Hub
+• 5. Resource & Textbook Hub
   ├─ Categories: Theory, Research Fields, and Computation Tools
   ├─ Quick Search: Alphabetical and pinyin filtering with favorites
   └─ External Links: Summaries of tutorials, lecture slides, and GitHub code
 
-• 5. Mailbox & Poster OCR
+• 6. Mailbox & Poster OCR
   ├─ Mailbox Sync: Connects with university IMAP/SMTP mailboxes
   ├─ Poster OCR: Extracts date, venue, and speaker from seminar posters
   └─ Calendar Addition: One-click addition to the lab calendar
 
-• 6. AI Academic Assistant
+• 7. AI Academic Assistant
   ├─ Formula Rendering: Live KaTeX rendering for LaTeX equations
   ├─ Translation & Polishing: Field-aware translation preserving math symbols
   └─ Provider Support: Compatible with standard LLM endpoints
 
-• 7. System & Permissions
+• 8. System & Permissions
   ├─ Registration Code: Default invite code (LAB-2026) to manage registration
   ├─ Role Hierarchy: Admin, PI/Teacher, and Student roles
   └─ Theme Settings: Light/Dark mode and background theme options
@@ -433,12 +452,16 @@ For detailed configuration steps, see the [Cloudflare Deployment Guide](docs/CLO
 
 ### 3. Common Workflows
 
-- **Paper Sharing**:
-  Click "Recommend Paper" on the dashboard or library, enter an arXiv ID or DOI, and the metadata will be retrieved automatically. Use "Directed Sharing" to share confidentially with specific colleagues or advisors.
-- **Seminar Scheduling**:
+- **Smart Paste & Multimodal Poster Ingestion**:
+  Click "Smart Paste" on the dashboard or schedule page. Paste announcement text, forwarded chat messages, or drop seminar poster images. The system automatically classifies and extracts event metadata, allowing one-click scheduling or submission to the review queue.
+- **Collaborative Scheduling & Approval Flow**:
+  Items submitted by regular members are routed to a "Pending Review" queue. Admins and PIs can review, edit, approve, or reject submissions in bulk, ensuring both collaborative contribution and calendar accuracy.
+- **Paper Sharing & Curated Library Archiving**:
+  Click "Recommend Paper" on the dashboard or library, enter an arXiv ID or DOI, and metadata is retrieved automatically. Choose "Public" or "Directed Sharing". All recommended and seminar papers are permanently archived in the searchable Literature Library with personal reading status tags.
+- **Seminar Scheduling & Calendar Sync**:
   Admins can import semester schedules via CSV. Speakers receive reminders a week before their talk to submit their abstract and slides. Members can export `.ics` files to sync schedules with Apple, Google, or Outlook calendars.
-- **Resource Hub**:
-  Add recommended textbooks, lecture slides, and GitHub companion code in the resource section for easy reference by new students.
+- **Resource Hub & Onboarding**:
+  Add recommended textbooks, lecture slides, and GitHub companion code in the resource section for quick alphabetical lookup, making onboarding seamless for new students.
 
 ---
 
