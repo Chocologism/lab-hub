@@ -32,15 +32,17 @@
   - [一、项目初衷 (Motivation)](#一项目初衷-motivation)
   - [二、模块设计与系统架构 (Architecture)](#二模块设计与系统架构-architecture)
   - [三、使用手册与快速上手 (User Manual)](#三使用手册与快速上手-user-manual)
-  - [四、版权、致谢与开源声明 (Copyright & Acknowledgements)](#四版权致谢与开源声明-copyright--acknowledgements)
-  - [五、赞助与支持 (Buy Me a Coffee)](#五赞助与支持-buy-me-a-coffee)
+  - [四、课题组二次开发与 Vibe-Coding 定制 (Customization & Vibe-Coding Skill)](#四课题组二次开发与-vibe-coding-定制-customization--vibe-coding-skill)
+  - [五、版权、致谢与开源声明 (Copyright & Acknowledgements)](#五版权致谢与开源声明-copyright--acknowledgements)
+  - [六、赞助与支持 (Buy Me a Coffee)](#六赞助与支持-buy-me-a-coffee)
 - [🇬🇧 English Documentation](#-english-documentation)
   - [Online Demo (Live Preview)](#online-demo-live-preview)
   - [1. Motivation](#1-motivation)
   - [2. Modular Design & Architecture](#2-modular-design--architecture)
   - [3. User Manual & Getting Started](#3-user-manual--getting-started)
-  - [4. Copyright, Acknowledgements & Open Source Statement](#4-copyright-acknowledgements--open-source-statement)
-  - [5. Sponsor & Buy Me a Coffee](#5-sponsor--buy-me-a-coffee)
+  - [4. Lab Customization & Vibe-Coding Skill](#4-lab-customization--vibe-coding-skill)
+  - [5. Copyright, Acknowledgements & Open Source Statement](#5-copyright-acknowledgements--open-source-statement)
+  - [6. Sponsor & Buy Me a Coffee](#6-sponsor--buy-me-a-coffee)
 
 ---
 
@@ -232,7 +234,38 @@ docker compose -f deploy/docker-compose.yml up -d
 
 ---
 
-## 四、版权、致谢与开源声明 (Copyright & Acknowledgements)
+## 四、课题组二次开发与 Vibe-Coding 定制 (Customization & Vibe-Coding Skill)
+
+为了让任何高校院系或科研课题组（如计算机视觉、自然语言处理、生物信息、计算化学、凝聚态物理等）都能以极低门槛将 LabOrbit 改造为本组专属的科研协作平台，本项目原生内置了完备的 **Vibe-Coding 专属开发技能（Agent Skill）**：`vibe-coding-lab-orbit`。
+
+### 1. 技能存放路径与规范
+- **AI 智能体自动发现入口**：[`.agents/skills/vibe-coding-lab-orbit/SKILL.md`](.agents/skills/vibe-coding-lab-orbit/SKILL.md)（规范目录，兼容 Antigravity、Cursor、Windsurf、Claude Code、Codex 等主流 AI 编程 Agent）；
+- **开发者网页查阅入口**：[`skills/vibe-coding-lab-orbit/SKILL.md`](skills/vibe-coding-lab-orbit/SKILL.md)（镜像目录，便于直接在 GitHub 网页文件树中查阅）。
+
+### 2. 核心覆盖能力 (Core Capabilities)
+该 Skill 沉淀了从架构定位到生产验收的 8 大全栈标准作业程序 (SOP)：
+1. **全栈架构地图与代码定位**：完整梳理 12 个前端主视图、核心公共组件库（`BaseDialog`、`AppIcon`、`SmartPaste` 等）与三轨后端服务地图，秒级定位业务代码；
+2. **课题组一键适配与自动化重整**：提供针对不同学科的站点名称、Logo 与 Favicon、学科预置数据种子（Seed & Mock）及高校专属邮箱后缀的平滑替换方案；
+3. **全栈双轨功能开发与接口对接**：阐明「三轨一致性原则（Triple Consistency）」——FastAPI（自建）+ Cloudflare Pages Functions（托管）+ Demo Adapter（静态沙盒）同步开发与契约保持；
+4. **数据库操作与平滑迁移**：规范 SQLite 与 Cloudflare D1 的安全加法迁移方案，杜绝破坏性数据变更；
+5. **页面布局与视觉重整规范**：详述 Liquid Glass 流动毛玻璃设计变量、`BaseDialog` 双重坐标判定防误关黄金规则，以及多端自适应响应式设计；
+6. **3D 动画、微动效与 KaTeX 渲染**：指导调节 Three.js 封面轮播景深与手势阻尼、Hover 卡片微动效，以及 LaTeX 数学公式实时排版引擎；
+7. **设计图标体系扩展与品牌替换**：基于 `AppIcon.vue` 的 50+ 语义化 SVG 矢量图标字典扩展机制；
+8. **质量门禁与测试验收清单**：包含 57 个测试套件、369+ 单元测试 100% 通过核查、多环境静态构建与本地服务拉起验证。
+
+### 3. 如何借助 AI 进行 Vibe-Coding 定制
+在支持 Agent Skill 的编辑器（如 Antigravity、Cursor、Windsurf 等）中，无需手动翻阅全站代码，只需像与架构师对话一样提出需求，AI 将自动加载该 Skill 并执行精确修改：
+
+> **示例提问与指令：**
+> - *"我想把 LabOrbit 适配到我们人工智能与计算机视觉课题组，请按照 `vibe-coding-lab-orbit` skill 的指南，帮我把预置数据、论文推荐分类和站点名称一键更新。"*
+> - *"请在文献库卡片上新增一个‘一键复制 BibTeX’的按钮，并遵循三轨一致性原则补充接口和演示沙盒。"*
+> - *"帮我把组会 3D 海报轮播的旋转惯性调大一点，卡片加一个发光悬停特效。"*
+
+修改完成后，AI 将自动运行 `npm --prefix frontend test` 确保全部 369 个单元测试 100% 通过，杜绝功能回退。
+
+---
+
+## 五、版权、致谢与开源声明 (Copyright & Acknowledgements)
 
 ### 1. 开发方式 (Vibe-Coding)
 
@@ -265,7 +298,7 @@ docker compose -f deploy/docker-compose.yml up -d
 
 ---
 
-## 五、赞助与支持 (Buy Me a Coffee)
+## 六、赞助与支持 (Buy Me a Coffee)
 
 如果 LabOrbit 对你的科研日常、课题组协作或开发有所帮助，欢迎请作者喝杯咖啡 ☕️，感谢你的认可与支持！
 
@@ -465,7 +498,38 @@ For detailed configuration steps, see the [Cloudflare Deployment Guide](docs/CLO
 
 ---
 
-## 4. Copyright, Acknowledgements & Open Source Statement
+## 4. Lab Customization & Vibe-Coding Skill
+
+To enable any research laboratory across various disciplines (Computer Science, Bio-medicine, Computational Chemistry, Physics, Materials Science, etc.) to effortlessly customize and rebrand LabOrbit into their dedicated hub, the project natively provides a comprehensive **Vibe-Coding Agent Skill**: `vibe-coding-lab-orbit`.
+
+### 1. Skill Specifications & Locations
+- **Agent Auto-Discovery Path**: [`.agents/skills/vibe-coding-lab-orbit/SKILL.md`](.agents/skills/vibe-coding-lab-orbit/SKILL.md) (Standard location recognized by Antigravity, Cursor, Windsurf, Claude Code, and Codex);
+- **GitHub Web Directory**: [`skills/vibe-coding-lab-orbit/SKILL.md`](skills/vibe-coding-lab-orbit/SKILL.md) (Directly readable on the GitHub repository tree).
+
+### 2. Core Capabilities Covered
+The skill establishes 8 full-stack Standard Operating Procedures (SOPs):
+1. **Codebase Navigation**: Quick-reference map covering all 12 frontend views, common UI components, and dual-backend routes;
+2. **Domain & Lab Adaptation**: Step-by-step migration guide to adapt lab names, logos, seed data, and university email presets for different academic domains;
+3. **Full-Stack API Wiring ("Triple Consistency")**: Guidelines for implementing new features simultaneously across FastAPI (self-hosted), Cloudflare Pages Functions (serverless), and Demo Adapter (GitHub Pages sandbox);
+4. **Database Operations & Migrations**: Additive migration rules for SQLite and Cloudflare D1 to ensure zero downtime and data safety;
+5. **UI & Layout Customization**: Liquid Glass design tokens, `BaseDialog` double-mousedown backdrop guard, and responsive design standards;
+6. **3D Animations & Scientific Typesetting**: Three.js 3D cover carousel tuning, CSS micro-interactions, and KaTeX LaTeX rendering;
+7. **Semantic Icon System**: Extending the central `AppIcon.vue` SVG icon library;
+8. **Pre-Flight Gates & Test Verification**: Complete test verification suite ensuring 100% pass rate across all 369 unit tests before shipping.
+
+### 3. How to Customize via Vibe-Coding
+In any AI-assisted coding environment (such as Antigravity, Cursor, or Windsurf), developers or lab members can simply issue high-level prompts:
+
+> **Example Prompts:**
+> - *"Please adapt LabOrbit for our NLP & Computer Vision lab following the `vibe-coding-lab-orbit` skill guide, updating the site metadata, demo papers, and seed categories."*
+> - *"Add a 'Copy BibTeX' button to the literature card, following the Triple Consistency rule to keep FastAPI, Cloudflare Functions, and demo mock in sync."*
+> - *"Adjust the 3D seminar carousel dampening and add a glowing hover border to the cards."*
+
+The AI assistant will automatically consult the SOP, make precise modifications across the stack, and run `npm --prefix frontend test` to ensure all 369 unit tests pass with zero regressions.
+
+---
+
+## 5. Copyright, Acknowledgements & Open Source Statement
 
 ### 1. Development Approach (Vibe-Coding)
 
@@ -498,7 +562,7 @@ The user interface and animations make use of several open-source libraries:
 
 ---
 
-## 5. Sponsor & Buy Me a Coffee
+## 6. Sponsor & Buy Me a Coffee
 
 If LabOrbit helps your research workflow, lab collaboration, or engineering setup, feel free to buy the author a coffee ☕️ to support ongoing maintenance and feature development!
 
