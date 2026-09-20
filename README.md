@@ -1,7 +1,11 @@
-# LabHub - 学术课题组科研协作平台 / Academic Research Lab Hub
+<p align="center">
+  <img src="docs/images/logo.png" alt="LabHub Logo" width="140" style="border-radius: 20px;" />
+</p>
+
+<h1 align="center">LabHub</h1>
 
 <p align="center">
-  <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=80" alt="LabHub Banner" width="100%" style="border-radius: 12px; max-height: 320px; object-fit: cover;" />
+  <strong>学术课题组科研协作平台 / Academic Research Lab Hub</strong>
 </p>
 
 <p align="center">
