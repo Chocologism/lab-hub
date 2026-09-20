@@ -68,3 +68,5 @@ htmlcov/
 *.bak
 *.backup
 scratch/
+*.mp4
+
