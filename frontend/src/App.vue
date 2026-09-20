@@ -97,7 +97,7 @@ function onUpdatePinned(val) {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 99;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='160' viewBox='0 0 260 160'%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' transform='rotate(-20 130 80)' fill='%2394a3b8' fill-opacity='0.08' font-size='14' font-family='system-ui, -apple-system, sans-serif' font-weight='500'%3E%E8%99%9A%E6%9E%84%E4%BF%A1%E6%81%AF%EF%BC%8C%E4%BB%85%E4%BE%9B%E5%B1%95%E7%A4%BA%3C/text%3E%3C/svg%3E");
+  z-index: 9980;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='280' viewBox='0 0 460 280'%3E%3Ctext x='115' y='70' text-anchor='middle' dominant-baseline='central' transform='rotate(-22 115 70)' fill='%23ffffff' fill-opacity='0.18' font-size='24' font-family='system-ui, -apple-system, sans-serif' font-weight='600' letter-spacing='2'%3E%E8%99%9A%E6%9E%84%E4%BF%A1%E6%81%AF%EF%BC%8C%E4%BB%85%E4%BE%9B%E5%B1%95%E7%A4%BA%3C/text%3E%3Ctext x='345' y='210' text-anchor='middle' dominant-baseline='central' transform='rotate(-22 345 210)' fill='%23ffffff' fill-opacity='0.18' font-size='24' font-family='system-ui, -apple-system, sans-serif' font-weight='600' letter-spacing='2'%3E%E8%99%9A%E6%9E%84%E4%BF%A1%E6%81%AF%EF%BC%8C%E4%BB%85%E4%BE%9B%E5%B1%95%E7%A4%BA%3C/text%3E%3C/svg%3E");
 }
 </style>
