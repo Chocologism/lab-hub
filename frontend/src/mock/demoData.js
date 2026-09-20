@@ -628,11 +628,15 @@ export const DEMO_EMAILS = [
     id: 801,
     msg_uid: 'uid-801',
     subject: '【学术讲座】空间引力波探测与星系形成演化前沿研讨',
+    sender_name: '国家天文台学术委员会',
+    sender_email: 'academic@nao.cas.cn',
     from_addr: '国家天文台学术委员会 <academic@nao.cas.cn>',
     from_name: '国家天文台学术委员会',
+    recipient: 'astro_lab@cstnet.cn',
     to_addr: 'astro_lab@cstnet.cn',
     date_str: formatOffsetDate(-1) + ' 09:30:00',
     created_at: formatOffsetDate(-1) + ' 09:30:00',
+    snippet: '各位老师同学：兹定于本周五举行关于空间引力波探测的线上线下联合报告会。主讲人：张维民 研究员（中国科学院国家空间科学中心）。时间：' + formatOffsetDate(3) + ' 14:30。地点：天文大厦三楼报告厅 / 腾讯会议：882-910-334。重点探讨极端质量比旋进建模与暗物质晕演化。',
     body_text: '各位老师同学：兹定于本周五举行关于空间引力波探测的线上线下联合报告会。主讲人：张维民 研究员（中国科学院国家空间科学中心）。时间：' + formatOffsetDate(3) + ' 14:30。地点：天文大厦三楼报告厅 / 腾讯会议：882-910-334。',
     body_html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 680px;">
       <h2 style="color: #0f172a; border-bottom: 2px solid #38bdf8; padding-bottom: 10px; margin-top: 0;">空间引力波探测与高红移星系演化前沿研讨会通知</h2>
@@ -659,11 +663,15 @@ export const DEMO_EMAILS = [
     id: 802,
     msg_uid: 'uid-802',
     subject: '中国天文学会 2026 年学术年会第一轮通知及征文启事',
+    sender_name: '中国天文学会秘书处',
+    sender_email: 'cas@pmo.ac.cn',
     from_addr: '中国天文学会秘书处 <cas@pmo.ac.cn>',
     from_name: '中国天文学会秘书处',
+    recipient: 'astro_lab@cstnet.cn',
     to_addr: 'astro_lab@cstnet.cn',
     date_str: formatOffsetDate(-2) + ' 14:15:00',
     created_at: formatOffsetDate(-2) + ' 14:15:00',
+    snippet: '各位会员、天文学界同仁：中国天文学会 2026 年学术年会拟定于 10 月中旬在南京举行。现启动分会场征文与大会口头报告申请，涵盖星系宇宙学、恒星演化、空间探测技术与 AI for Science 天文智能计算等前沿专题。',
     body_text: '各位会员、天文学界同仁：中国天文学会 2026 年学术年会拟定于 10 月中旬召开。本届年会涵盖星系宇宙学、恒星与行星系统、大科学装置等多个专题分会场，现启动征文与大会口头报告申请。',
     body_html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b;">
       <h2 style="color: #0f172a; border-bottom: 2px solid #818cf8; padding-bottom: 8px;">中国天文学会 2026 年学术年会第一轮通知</h2>
@@ -684,11 +692,15 @@ export const DEMO_EMAILS = [
     id: 803,
     msg_uid: 'uid-803',
     subject: '【基金委提醒】2026 年度国家自然科学基金重点项目进展报告提交提醒',
+    sender_name: '国家自然科学基金委员会',
+    sender_email: 'report@nsfc.gov.cn',
     from_addr: '国家自然科学基金委员会 <report@nsfc.gov.cn>',
     from_name: '国家自然科学基金委员会',
+    recipient: 'lihua@lab.edu',
     to_addr: 'lihua@lab.edu',
     date_str: formatOffsetDate(-3) + ' 11:00:00',
     created_at: formatOffsetDate(-3) + ' 11:00:00',
+    snippet: '尊敬的李华教授：您负责的重点项目《宽视场巡天中弱引力透镜多维系统误差建模与宇宙学限制》（项目号：12233005）2026 年度进展报告填报通道已开放，请组织项目组成员系统梳理本年度代表性成果并在线提交。',
     body_text: '尊敬的李华教授：您负责的重点项目（项目批准号：12233005）年度进展报告现已开放填报，请登录科学基金网络信息系统在线填写并于规定时间前提交依托单位审核。',
     body_html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b;">
       <h3 style="color: #0f172a;">国家自然科学基金委员会 业务提醒函</h3>
@@ -705,11 +717,15 @@ export const DEMO_EMAILS = [
     id: 804,
     msg_uid: 'uid-804',
     subject: 'The Astrophysical Journal: Decision on Manuscript #ApJ-108291',
+    sender_name: 'ApJ Editorial Office',
+    sender_email: 'apj@aas.org',
     from_addr: 'The Astrophysical Journal <apj@aas.org>',
     from_name: 'ApJ Editorial Office',
+    recipient: 'lihua@lab.edu',
     to_addr: 'lihua@lab.edu',
     date_str: formatOffsetDate(-4) + ' 16:45:00',
     created_at: formatOffsetDate(-4) + ' 16:45:00',
+    snippet: 'Dear Prof. Hua Li: We have received the referee report for your manuscript #ApJ-108291 "Precision Cosmology with Stage-IV Weak Lensing Surveys". The referee recommends Minor Revision. Please check attached referee comments and submit your revised manuscript within 30 days.',
     body_text: 'Dear Prof. Li, We have received the referee report for your manuscript "Precision Cosmology with Stage-IV Weak Lensing Surveys". The referee recommends minor revision...',
     body_html: `<div style="font-family: Georgia, serif; line-height: 1.7; color: #1e293b;">
       <h3 style="font-family: sans-serif; color: #0f172a;">The Astrophysical Journal - Editorial Decision</h3>

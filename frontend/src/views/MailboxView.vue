@@ -1561,13 +1561,13 @@ onBeforeUnmount(() => {
             :class="{ active: selectedEmail?.id === item.id && !selectedEmail?.isSent }"
             @click="openEmailDetail(item, false)"
           >
-            <div class="email-avatar" :title="item.sender_name || item.sender_email">
-              {{ getInitial(item.sender_name || item.sender_email) }}
+            <div class="email-avatar" :title="item.sender_name || item.from_name || item.sender_email || item.from_addr">
+              {{ getInitial(item.sender_name || item.from_name || item.sender_email || item.from_addr) }}
             </div>
 
             <div class="email-card-body">
               <div class="email-card-header">
-                <span class="sender-name">{{ item.sender_name || item.sender_email }}</span>
+                <span class="sender-name">{{ item.sender_name || item.from_name || item.sender_email || item.from_addr || '学术通知' }}</span>
                 <div class="header-right-meta">
                   <button
                     v-if="isConferenceEmail(item)"
@@ -1589,6 +1589,7 @@ onBeforeUnmount(() => {
                     <AppIcon name="calendar" :size="13" />
                     <span>推送到日程</span>
                   </button>
+                  <span class="email-date" :title="item.date_str">{{ formatEmailDate(item.date_str) }}</span>
                   <button
                     type="button"
                     class="email-delete-btn"
@@ -1598,7 +1599,6 @@ onBeforeUnmount(() => {
                   >
                     <AppIcon name="trash" :size="13" />
                   </button>
-                  <span class="email-date" :title="item.date_str">{{ formatEmailDate(item.date_str) }}</span>
                 </div>
               </div>
 
@@ -1606,10 +1606,12 @@ onBeforeUnmount(() => {
                 {{ item.subject || '（无主题）' }}
               </h3>
 
-              <p class="email-snippet">{{ item.snippet || '（无正文预览）' }}</p>
+              <p class="email-snippet">{{ item.snippet || item.body_text?.slice(0, 160) || '（测试内容：本邮件包含学术报告交流与会议通知正文内容）' }}</p>
 
               <div class="email-card-footer">
-                <span class="sender-email-chip mono">{{ item.sender_email }}</span>
+                <span v-if="item.sender_email || item.from_addr" class="sender-email-chip mono">
+                  {{ item.sender_email || (item.from_addr?.includes('<') ? item.from_addr.match(/<([^>]+)>/)?.[1] : item.from_addr) }}
+                </span>
                 <span v-if="hasEmailDocs(item)" class="badge cyan small-badge">
                   包含通知文档 {{ getEmailDocsCount(item) > 1 ? `(${getEmailDocsCount(item)})` : '' }}
                 </span>
@@ -1704,10 +1706,10 @@ onBeforeUnmount(() => {
           <div class="reader-header-row">
             <div class="reader-sender">
               <span class="meta-label">发件人：</span>
-              <strong>{{ selectedEmail.sender_name }}</strong>
-              <span class="mono muted">&lt;{{ selectedEmail.sender_email }}&gt;</span>
+              <strong>{{ selectedEmail.sender_name || selectedEmail.from_name || '学术发件人' }}</strong>
+              <span class="mono muted">&lt;{{ selectedEmail.sender_email || selectedEmail.from_addr || 'academic@nao.cas.cn' }}&gt;</span>
             </div>
-            <span class="email-date-badge">{{ selectedEmail.date_str }}</span>
+            <span class="email-date-badge">{{ selectedEmail.date_str || selectedEmail.created_at }}</span>
           </div>
 
           <div v-if="selectedEmail.isSent && selectedEmail.recipients?.length" class="reader-recipient sent-recipients-box">
@@ -1718,9 +1720,9 @@ onBeforeUnmount(() => {
               </span>
             </div>
           </div>
-          <div v-else-if="selectedEmail.recipient" class="reader-recipient">
+          <div v-else-if="selectedEmail.recipient || selectedEmail.to_addr" class="reader-recipient">
             <span class="meta-label">收件人：</span>
-            <span class="mono">{{ selectedEmail.recipient }}</span>
+            <span class="mono">{{ selectedEmail.recipient || selectedEmail.to_addr }}</span>
           </div>
         </div>
 
@@ -3453,20 +3455,23 @@ onBeforeUnmount(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: 0.1px;
 }
 
 .email-date {
   font-size: 12px;
   color: var(--muted);
   flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  margin: 0 2px;
 }
 
 .email-subject {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text);
-  margin: 2px 0;
-  line-height: 1.4;
+  margin: 2px 0 3px;
+  line-height: 1.45;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3480,6 +3485,7 @@ onBeforeUnmount(() => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  margin: 1px 0 4px;
 }
 
 .email-card-footer {
@@ -3497,6 +3503,8 @@ onBeforeUnmount(() => {
   padding: 2px 8px;
   border-radius: 6px;
   border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
 }
 
 .small-badge {

@@ -19,7 +19,7 @@ import {
 } from './demoData'
 
 const STORAGE_KEYS = {
-  VERSION: 'laborbit_demo_version_v3',
+  VERSION: 'laborbit_demo_version_v4',
   SEMINARS: 'laborbit_demo_seminars',
   PAPERS: 'laborbit_demo_papers',
   NOTICES: 'laborbit_demo_notices',
@@ -39,9 +39,9 @@ const STORAGE_KEYS = {
 export function initDemoStorage(force = false) {
   if (typeof localStorage === 'undefined') return
 
-  const isCurrentVersion = localStorage.getItem(STORAGE_KEYS.VERSION) === '3.0'
+  const isCurrentVersion = localStorage.getItem(STORAGE_KEYS.VERSION) === '4.0'
   if (!isCurrentVersion || force) {
-    localStorage.setItem(STORAGE_KEYS.VERSION, '3.0')
+    localStorage.setItem(STORAGE_KEYS.VERSION, '4.0')
     localStorage.setItem(STORAGE_KEYS.SEMINARS, JSON.stringify(DEMO_SEMINARS))
     localStorage.setItem(STORAGE_KEYS.PAPERS, JSON.stringify(DEMO_ARXIV_PAPERS))
     localStorage.setItem(STORAGE_KEYS.NOTICES, JSON.stringify(DEMO_NOTICES))
@@ -692,12 +692,45 @@ export async function demoAxiosAdapter(config) {
       return respond({ success: true, message: 'SMTP 连通性测试通过' })
     }
 
+    const normalizeDemoEmail = (e) => {
+      if (!e) return e
+      let sName = e.sender_name || e.from_name
+      let sEmail = e.sender_email
+      if (!sEmail && e.from_addr) {
+        const match = e.from_addr.match(/<([^>]+)>/)
+        sEmail = match ? match[1] : e.from_addr
+      }
+      if (!sName && e.from_addr) {
+        sName = e.from_addr.split('<')[0].trim()
+      }
+      sName = sName || '学术通知'
+      sEmail = sEmail || 'academic@nao.cas.cn'
+      const recipient = e.recipient || e.to_addr || 'astro_lab@cstnet.cn'
+      const snippet = e.snippet || (e.body_text ? e.body_text.slice(0, 160) : '') || '（测试内容：本邮件包含学术报告交流与会议通知正文内容）'
+      return {
+        ...e,
+        sender_name: sName,
+        sender_email: sEmail,
+        from_name: sName,
+        from_addr: `${sName} <${sEmail}>`,
+        recipient,
+        to_addr: recipient,
+        snippet
+      }
+    }
+
     if (cleanUrl === '/api/mailbox/emails') {
       if (method === 'get') {
         const q = (getParam('q') || '').toLowerCase().trim()
-        let result = [...emails]
+        let result = emails.map(normalizeDemoEmail)
         if (q) {
-          result = result.filter(e => (e.subject || '').toLowerCase().includes(q) || (e.from_name || '').toLowerCase().includes(q) || (e.body_text || '').toLowerCase().includes(q))
+          result = result.filter(e =>
+            (e.subject || '').toLowerCase().includes(q) ||
+            (e.sender_name || '').toLowerCase().includes(q) ||
+            (e.sender_email || '').toLowerCase().includes(q) ||
+            (e.body_text || '').toLowerCase().includes(q) ||
+            (e.snippet || '').toLowerCase().includes(q)
+          )
         }
         return respond(result)
       }
@@ -712,7 +745,7 @@ export async function demoAxiosAdapter(config) {
       const emailId = parseInt(mEmailId[1], 10)
       if (method === 'get') {
         const found = emails.find(e => e.id === emailId) || emails[0]
-        return respond(found)
+        return respond(normalizeDemoEmail(found))
       }
       if (method === 'delete') {
         emails = emails.filter(e => e.id !== emailId)

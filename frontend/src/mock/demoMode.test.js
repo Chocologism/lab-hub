@@ -100,6 +100,12 @@ describe('Demo Mode & Mock Adapter', () => {
     expect(emailsRes.status).toBe(200)
     expect(Array.isArray(emailsRes.data)).toBe(true)
     expect(emailsRes.data.length).toBeGreaterThanOrEqual(4)
+    emailsRes.data.forEach(e => {
+      expect(e.sender_name).toBeTruthy()
+      expect(e.sender_email).toBeTruthy()
+      expect(e.snippet).toBeTruthy()
+      expect(e.snippet).not.toContain('无正文预览')
+    })
 
     // 4. Feedback endpoints
     const feedbackRes = await demoAxiosAdapter({ url: '/api/feedback', method: 'get' })
