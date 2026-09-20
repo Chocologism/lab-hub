@@ -4,9 +4,16 @@
       <!-- 外部团组品牌标题 -->
       <header class="login-brand-header">
         <div class="brand-badge-wrap">
-          <div class="brand-logo-emblem">
+          <a
+            href="https://github.com/Chocologism/lab-orbit"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="brand-logo-emblem"
+            title="访问 GitHub 开源仓库 (LabOrbit)"
+            aria-label="访问 GitHub 开源仓库 (LabOrbit)"
+          >
             <img src="/assets/LO_logo.svg" alt="LabOrbit Logo" class="brand-logo-img" />
-          </div>
+          </a>
           <h1 class="brand-name">{{ siteConfig.labName }}</h1>
         </div>
         <p class="brand-subtitle">{{ siteConfig.siteSlogan || '文献、组会排期与研习资料高效协作' }}</p>
@@ -305,25 +312,34 @@ const handleRegister = async () => {
 }
 
 .brand-logo-emblem {
-  width: 52px;
-  height: 52px;
+  width: 64px;
+  height: 64px;
   border-radius: 9999px;
-  background: radial-gradient(circle, rgba(187, 144, 252, 0.22) 0%, rgba(12, 10, 26, 0.85) 100%);
+  background: radial-gradient(circle, rgba(187, 144, 252, 0.25) 0%, rgba(12, 10, 26, 0.88) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid rgba(187, 144, 252, 0.45);
-  box-shadow: 0 0 24px rgba(192, 132, 252, 0.45), 0 4px 14px rgba(0, 0, 0, 0.5);
+  border: 1.5px solid rgba(187, 144, 252, 0.5);
+  box-shadow: 0 0 28px rgba(192, 132, 252, 0.5), 0 4px 14px rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
-  padding: 6px;
+  padding: 8px;
   box-sizing: border-box;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.brand-logo-emblem:hover {
+  transform: scale(1.08) rotate(5deg);
+  border-color: rgba(220, 185, 255, 0.85);
+  box-shadow: 0 0 36px rgba(192, 132, 252, 0.75), 0 6px 18px rgba(0, 0, 0, 0.6);
 }
 
 .brand-logo-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 6px rgba(187, 144, 252, 0.45));
+  filter: drop-shadow(0 0 8px rgba(187, 144, 252, 0.5));
 }
 
 .brand-name {
@@ -658,9 +674,9 @@ const handleRegister = async () => {
     font-size: 17px;
   }
   .brand-logo-emblem {
-    width: 44px;
-    height: 44px;
-    font-size: 13px;
+    width: 54px;
+    height: 54px;
+    padding: 6px;
   }
   .flip-card__front,
   .flip-card__back {

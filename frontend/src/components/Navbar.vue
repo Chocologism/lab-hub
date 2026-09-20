@@ -313,10 +313,17 @@ function logout() {
           </div>
         </div>
 
-        <router-link to="/" class="sidebar-brand" :aria-label="siteConfig.labName + '首页'">
+        <a
+          href="https://github.com/Chocologism/lab-orbit"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="sidebar-brand"
+          :title="siteConfig.labName + ' · 访问 GitHub 开源仓库'"
+          aria-label="访问 GitHub 开源仓库"
+        >
           <img src="/assets/LO_logo.svg" alt="LabOrbit Logo" class="sidebar-brand-logo" />
           <span class="sidebar-brand-text">{{ siteConfig.labShortName }}</span>
-        </router-link>
+        </a>
       </div>
 
       <nav class="sidebar-links" aria-label="主导航">
@@ -608,15 +615,16 @@ function logout() {
 }
 
 .sidebar-brand-logo {
-  width: 28px;
-  height: 28px;
+  width: 38px;
+  height: 38px;
   object-fit: contain;
-  filter: drop-shadow(0 0 8px rgba(187, 144, 252, 0.45));
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 0 10px rgba(187, 144, 252, 0.5));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
 }
 
 .sidebar-brand:hover .sidebar-brand-logo {
-  transform: scale(1.14) rotate(8deg);
+  transform: scale(1.15) rotate(8deg);
+  filter: drop-shadow(0 0 16px rgba(187, 144, 252, 0.8));
 }
 
 .sidebar-brand-text {

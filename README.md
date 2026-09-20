@@ -27,11 +27,13 @@
   - [二、模块设计与系统架构 (Architecture)](#二模块设计与系统架构-architecture)
   - [三、使用手册与快速上手 (User Manual)](#三使用手册与快速上手-user-manual)
   - [四、版权、致谢与开源声明 (Copyright & Acknowledgements)](#四版权致谢与开源声明-copyright--acknowledgements)
+  - [五、赞助与支持 (Buy Me a Coffee)](#五赞助与支持-buy-me-a-coffee)
 - [🇬🇧 English Documentation](#-english-documentation)
   - [1. Motivation](#1-motivation)
   - [2. Modular Design & Architecture](#2-modular-design--architecture)
   - [3. User Manual & Getting Started](#3-user-manual--getting-started)
   - [4. Copyright, Acknowledgements & Open Source Statement](#4-copyright-acknowledgements--open-source-statement)
+  - [5. Sponsor & Buy Me a Coffee](#5-sponsor--buy-me-a-coffee)
 
 ---
 
@@ -204,11 +206,15 @@ docker compose -f deploy/docker-compose.yml up -d
 
 本项目在开发中采用了 **Vibe-Coding** 方式：由人类开发者把控实际需求、交互流程与整体架构，借助 AI 编程工具进行代码编写、接口联调与测试用例补全，快速完成系统构建与重构。
 
-### 2. AI 辅助开发致谢
+### 2. 贡献者与 AI 结对协作 (Contributors)
 
-在代码编写与测试验证过程中，主要使用了以下两款 AI 工具协助开发：
-- **OpenAI Codex**：协助编写后端 API、数据库查询逻辑以及自动化回归测试用例；
-- **Google DeepMind Antigravity**：协助梳理前后端架构、编写 Vue 3 组件、打通海报识别流程并完成 Cloudflare Serverless 适配。
+本项目由人类维护者主导需求把控与交互架构，并与 AI 结对编程助手共同构建完成：
+
+| 贡献者 / 协作伙伴 | 角色定位 | 贡献范畴 |
+| :--- | :--- | :--- |
+| **[@Chocologism](https://github.com/Chocologism)** (Hengkai Ding) | Project Lead / Core Maintainer | 需求设计、业务逻辑、前端交互与部署运维 💻 🎨 🚀 |
+| **Google DeepMind Antigravity** | AI Pair Programmer | 前端 Vue 3 组件生态、全栈架构重构、海报识别与 Cloudflare 适配 🤖 💡 🛠️ |
+| **OpenAI Codex** | AI Pair Programmer | 后端 FastAPI 路由、数据库模型、测试用例补全与接口联调 🤖 🧪 ⚡ |
 
 ### 3. 开源组件与设计致谢
 
@@ -224,6 +230,18 @@ docker compose -f deploy/docker-compose.yml up -d
 - **MIT License**：本项目基于通用的 [MIT 许可证](LICENSE) 开源，可自由使用、修改与部署；
 - **非营利声明**：本项目完全开源，为个人/课题组科研实际需求驱动的非营利工具，不包含任何商业变现或付费功能；
 - **欢迎共建**：欢迎提出改进建议、提交 Issue 或发起 Pull Request。
+
+---
+
+## 五、赞助与支持 (Buy Me a Coffee)
+
+如果 LabOrbit 对你的科研日常、课题组协作或开发有所帮助，欢迎请作者喝杯咖啡 ☕️，感谢你的认可与支持！
+
+<p align="center">
+  <img src="docs/images/sponsor_qr.jpg" alt="Buy Me a Coffee / Alipay QR Code" width="220" style="border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+  <br>
+  <sub>扫码支持作者（支付宝）</sub>
+</p>
 
 ---
 
@@ -396,11 +414,15 @@ For detailed configuration steps, see the [Cloudflare Deployment Guide](docs/CLO
 
 This project was developed using a **Vibe-Coding** approach: human developers defined the real-world workflow requirements, interactions, and system architecture, while AI coding assistants supported code implementation, API wiring, and automated test coverage to iterate quickly.
 
-### 2. AI-Assisted Development Acknowledgements
+### 2. Contributors & AI Pair Programming
 
-We acknowledge the assistance of the following AI tools during development:
-- **OpenAI Codex**: Assisted in writing backend APIs, database query handlers, and automated test suites;
-- **Google DeepMind Antigravity**: Assisted in full-stack architecture organization, Vue 3 components, poster OCR processing, and Cloudflare Serverless integration.
+This project was architected and led by human maintainers in collaboration with AI pair programmers:
+
+| Contributor / Partner | Role | Focus Areas |
+| :--- | :--- | :--- |
+| **[@Chocologism](https://github.com/Chocologism)** (Hengkai Ding) | Project Lead / Core Maintainer | Architecture design, domain logic, frontend UX, deployment 💻 🎨 🚀 |
+| **Google DeepMind Antigravity** | AI Pair Programmer | Vue 3 UI ecosystem, full-stack refactoring, poster OCR, Cloudflare edge 🤖 💡 🛠️ |
+| **OpenAI Codex** | AI Pair Programmer | FastAPI routing, data schemas, test suites, API wiring 🤖 🧪 ⚡ |
 
 ### 3. Open Source Projects & UI Libraries
 
@@ -416,3 +438,15 @@ The user interface and animations make use of several open-source libraries:
 - **License**: Released under the [MIT License](LICENSE). Free to use, adapt, and self-host;
 - **Non-Profit Statement**: This is a 100% open-source, non-profit tool developed for academic research workflows. It contains no commercial promotion, paid features, or monetization;
 - **Contributions**: Feedback, issue reports, and pull requests are warmly welcomed.
+
+---
+
+## 5. Sponsor & Buy Me a Coffee
+
+If LabOrbit helps your research workflow, lab collaboration, or engineering setup, feel free to buy the author a coffee ☕️ to support ongoing maintenance and feature development!
+
+<p align="center">
+  <img src="docs/images/sponsor_qr.jpg" alt="Buy Me a Coffee / Alipay QR Code" width="220" style="border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+  <br>
+  <sub>Scan with Alipay to support the author</sub>
+</p>

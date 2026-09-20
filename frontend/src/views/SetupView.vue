@@ -124,9 +124,16 @@ async function handleCompleteSetup() {
     <div class="setup-card">
       <!-- 头部介绍 -->
       <div class="setup-header">
-        <div class="setup-logo-wrap">
+        <a
+          href="https://github.com/Chocologism/lab-orbit"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="setup-logo-wrap"
+          title="访问 GitHub 开源仓库 (LabOrbit)"
+          aria-label="访问 GitHub 开源仓库 (LabOrbit)"
+        >
           <img src="/assets/LO_logo.svg" alt="LabOrbit Logo" class="setup-logo-img" />
-        </div>
+        </a>
         <div class="setup-badge">
           <AppIcon name="sparkles" class="badge-icon" />
           <span>首次部署向导</span>
@@ -347,25 +354,34 @@ body.dark .setup-card,
 }
 
 .setup-logo-wrap {
-  width: 58px;
-  height: 58px;
-  margin: 0 auto 14px;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 16px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(187, 144, 252, 0.22) 0%, rgba(12, 10, 26, 0.85) 100%);
-  border: 1.5px solid rgba(187, 144, 252, 0.4);
-  box-shadow: 0 0 24px rgba(187, 144, 252, 0.35), 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle, rgba(187, 144, 252, 0.25) 0%, rgba(12, 10, 26, 0.88) 100%);
+  border: 1.5px solid rgba(187, 144, 252, 0.45);
+  box-shadow: 0 0 28px rgba(187, 144, 252, 0.4), 0 4px 12px rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  padding: 8px;
   box-sizing: border-box;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.setup-logo-wrap:hover {
+  transform: scale(1.1) rotate(6deg);
+  border-color: rgba(220, 185, 255, 0.85);
+  box-shadow: 0 0 36px rgba(187, 144, 252, 0.65), 0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
 .setup-logo-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 6px rgba(187, 144, 252, 0.45));
+  filter: drop-shadow(0 0 8px rgba(187, 144, 252, 0.5));
 }
 
 .setup-badge {

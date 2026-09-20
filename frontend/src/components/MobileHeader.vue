@@ -90,11 +90,22 @@ function logout() {
   <Teleport to="body">
     <header class="mobile-header">
       <div class="mobile-header-inner">
-        <router-link to="/" class="mobile-brand" aria-label="返回工作台">
-          <img src="/assets/LO_logo.svg" alt="LabOrbit Logo" class="mobile-brand-logo" />
-          <span class="brand-badge">{{ siteConfig.labShortName }}</span>
-          <span class="brand-title">{{ currentTitle }}</span>
-        </router-link>
+        <div class="mobile-brand-group">
+          <a
+            href="https://github.com/Chocologism/lab-orbit"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mobile-logo-link"
+            title="访问 GitHub 开源仓库"
+            aria-label="访问 GitHub 开源仓库"
+          >
+            <img src="/assets/LO_logo.svg" alt="LabOrbit Logo" class="mobile-brand-logo" />
+          </a>
+          <router-link to="/" class="mobile-brand" aria-label="返回工作台">
+            <span class="brand-badge">{{ siteConfig.labShortName }}</span>
+            <span class="brand-title">{{ currentTitle }}</span>
+          </router-link>
+        </div>
 
         <button
           type="button"
@@ -200,20 +211,41 @@ function logout() {
     margin: 0 auto;
   }
 
-  .mobile-brand {
+  .mobile-brand-group {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .mobile-logo-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
-    color: var(--text, #ffffff);
+    flex-shrink: 0;
+    padding: 2px;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-brand-logo {
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
-    filter: drop-shadow(0 0 6px rgba(187, 144, 252, 0.45));
-    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(187, 144, 252, 0.55));
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .mobile-logo-link:active .mobile-brand-logo {
+    transform: scale(0.92);
+  }
+
+  .mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--text, #ffffff);
   }
 
   .brand-badge {
