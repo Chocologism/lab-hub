@@ -39,9 +39,9 @@ const STORAGE_KEYS = {
 export function initDemoStorage(force = false) {
   if (typeof localStorage === 'undefined') return
 
-  const isCurrentVersion = localStorage.getItem(STORAGE_KEYS.VERSION) === '4.0'
+  const isCurrentVersion = localStorage.getItem(STORAGE_KEYS.VERSION) === '4.2'
   if (!isCurrentVersion || force) {
-    localStorage.setItem(STORAGE_KEYS.VERSION, '4.0')
+    localStorage.setItem(STORAGE_KEYS.VERSION, '4.2')
     localStorage.setItem(STORAGE_KEYS.SEMINARS, JSON.stringify(DEMO_SEMINARS))
     localStorage.setItem(STORAGE_KEYS.PAPERS, JSON.stringify(DEMO_ARXIV_PAPERS))
     localStorage.setItem(STORAGE_KEYS.NOTICES, JSON.stringify(DEMO_NOTICES))
@@ -637,6 +637,10 @@ export async function demoAxiosAdapter(config) {
   // 8. 学术邮箱中转 (Mailbox)
   if (cleanUrl.startsWith('/api/mailbox')) {
     let emails = getStored(STORAGE_KEYS.EMAILS, DEMO_EMAILS)
+    if (Array.isArray(emails) && (emails.length < DEMO_EMAILS.length || emails.some(e => !e.snippet || !e.sender_name || e.snippet.includes('无正文预览')))) {
+      emails = DEMO_EMAILS.slice()
+      setStored(STORAGE_KEYS.EMAILS, emails)
+    }
 
     if (cleanUrl === '/api/mailbox/config') {
       let mConfig = getStored(STORAGE_KEYS.MAILBOX_CONFIG, {

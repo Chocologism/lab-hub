@@ -53,4 +53,19 @@ describe('Mailbox clear all emails and delete single email functionality', () =>
     expect(template).toContain('@click="handleDeleteSingleEmail(selectedEmail)"')
     expect(template).toContain('删除邮件')
   })
+
+  it('renders email-subject on top row and sender info in email-sender-line', () => {
+    expect(template).toContain('class="email-card-top-row"')
+    expect(template).toContain('class="email-subject"')
+    expect(template).toContain('class="email-sender-line"')
+    expect(template).toContain('getSenderName(item)')
+    expect(template).toContain('getEmailSnippet(item)')
+  })
+
+  it('defines getSenderName, getSenderEmail, and getEmailSnippet helper functions in script', () => {
+    expect(script).toContain('function getSenderName(item)')
+    expect(script).toContain('function getSenderEmail(item)')
+    expect(script).toContain('function getEmailSnippet(item)')
+    expect(script).not.toContain("item.snippet || '（无正文预览）'")
+  })
 })
